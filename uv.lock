@@ -989,6 +989,54 @@ wheels = [
 ]
 
 [[package]]
+name = "pychoco"
+version = "0.2.1"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ef/05/86f5c81df8abc99710c1af93ae49a2ee48cf8249fb5fd8e2f2031e518316/pychoco-0.2.1-cp310-cp310-macosx_12_0_arm64.whl", hash = "sha256:2cbdcc9881ec404fd4b62cb3ed201ff555e752b3dc6643ed7cb1250a105668c1", size = 9254545 },
+    { url = "https://files.pythonhosted.org/packages/a5/c8/ab3d6cf62050e709b4f4e05bde555831a23c6172794f5bf47108cb4a6dfd/pychoco-0.2.1-cp310-cp310-macosx_12_0_x86_64.whl", hash = "sha256:6bff065db139065fc9008bd26b9ce95a28480d86bad85df1d950a449d0b90cde", size = 9248683 },
+    { url = "https://files.pythonhosted.org/packages/49/07/eb7d2ddc9a7cfb45752f82d5a89fe492befa8661ea4395dd89d9b6b0d7a8/pychoco-0.2.1-cp310-cp310-macosx_13_0_arm64.whl", hash = "sha256:5b9611c40832304d4faab68d98d26fde5c43c5c89ad77b73645595f3e0294e80", size = 9222002 },
+    { url = "https://files.pythonhosted.org/packages/ad/26/9db6d953d6abb5c95a6b9ecb2094d9b70bbd550ac29b8498c7f063ea0c0d/pychoco-0.2.1-cp310-cp310-macosx_13_0_x86_64.whl", hash = "sha256:19d4e2c71617fac681b5168579aaa0121415c160ab79905b3b0f01c191ed491e", size = 9240508 },
+    { url = "https://files.pythonhosted.org/packages/30/6b/a5b8a8cd931f06ea81e6c4a913dfe0e2339445b0f9d7e20cbd046242f0f5/pychoco-0.2.1-cp310-cp310-macosx_14_0_arm64.whl", hash = "sha256:f688311ab5b85dd1d0389ef0a8d4b8a32777aa1c83b72cd905d4c08eaa916333", size = 18097085 },
+    { url = "https://files.pythonhosted.org/packages/d9/75/803da761c5f88feb531632f2bf85102c0756be6b9cfb95727d64550a2446/pychoco-0.2.1-cp310-cp310-macosx_14_0_x86_64.whl", hash = "sha256:f3caa2fbeca7cf0d4bdb6899483bf757bd25bbe0f672000b17565c3c33d5189a", size = 18387791 },
+    { url = "https://files.pythonhosted.org/packages/a1/49/219e18aa678c9467ff2fce719ee128eeda9642206e3c27cef2c3f82608ae/pychoco-0.2.1-cp310-cp310-manylinux2014_x86_64.whl", hash = "sha256:efa57666c34de742ac92be349151ad9a0653d72f8a14b3c363e352f289f40147", size = 10693349 },
+    { url = "https://files.pythonhosted.org/packages/ae/0b/a6bd41302ea338615f65fa9c20e9a1b5986690d4f355e9f8b2d93aa9260b/pychoco-0.2.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:09192854bd5b2cf35d996256b8e448b7280d518b0ccd9e3711e76e7a1334cfb8", size = 10745105 },
+    { url = "https://files.pythonhosted.org/packages/ef/d5/2abf402e151ed3ae967e65bc70bcf079a69317ae0ae69333a6f73b111cb1/pychoco-0.2.1-cp310-cp310-win_amd64.whl", hash = "sha256:40bd290ba84363c86c933e408daee182a58a7451736265575f9b4b6ce8835a27", size = 19540392 },
+    { url = "https://files.pythonhosted.org/packages/b1/82/7c7877c3d1d4c7cdfd813d1ef433c5dac0b4660ae4dc39c40e155ca394bf/pychoco-0.2.1-cp311-cp311-macosx_12_0_arm64.whl", hash = "sha256:2aa9efa6a731f549354f7b080c4af35ef30503f8db4e552e7e418a3eb8c496ca", size = 9254546 },
+    { url = "https://files.pythonhosted.org/packages/60/91/7608e0704729bcfda024543237b702d38c6b55c0b57e9356ace2a52bd28f/pychoco-0.2.1-cp311-cp311-macosx_12_0_x86_64.whl", hash = "sha256:f68d0b01170729c5cbf1cf8e0363f8aae00839b839a1200db842ff26b9e049bd", size = 18436246 },
+    { url = "https://files.pythonhosted.org/packages/ea/fb/dc87f2d1071a6c3a35ca4b2adac0201bdf6cd1e73a2cc1c6613cb09399c7/pychoco-0.2.1-cp311-cp311-macosx_13_0_arm64.whl", hash = "sha256:86e8ba2620b3e98e14e3ac78dc21bcf1fc93046e1b7410ac82d6fd5dfb9356bf", size = 9222001 },
+    { url = "https://files.pythonhosted.org/packages/bc/13/56611edddcdb0c5607bc6d79aa484d7dd16916d40f82bc578571dc54ddbf/pychoco-0.2.1-cp311-cp311-macosx_13_0_x86_64.whl", hash = "sha256:74b24f2a62e173c48e90e6f95f1ff68bf603d54214ed6b5f2d55ab5e65bc68e2", size = 18408273 },
+    { url = "https://files.pythonhosted.org/packages/7d/2a/6419f97c92a17a366f4294c0e31aa1afaf9c265ba8f60b00f4107f593418/pychoco-0.2.1-cp311-cp311-macosx_14_0_arm64.whl", hash = "sha256:4933046f32ab4f133c34f9be5ae44ccf5451fc707e5c999d536384667892c850", size = 18097089 },
+    { url = "https://files.pythonhosted.org/packages/95/eb/27b0671411af688b72cdc13f515267c95aaad32239a80c986d5fb39f3661/pychoco-0.2.1-cp311-cp311-macosx_14_0_x86_64.whl", hash = "sha256:ac4081d894a36dfa061c1b71a93b0faadc8de9f487c0a98deacec8a68ebae8f6", size = 18387791 },
+    { url = "https://files.pythonhosted.org/packages/e2/8c/14ccf3bc6c819e3737e6917bc1236fe5381e17336b8ca83b7233b6272242/pychoco-0.2.1-cp311-cp311-manylinux2014_x86_64.whl", hash = "sha256:d1be602045ceecd778032801a9c577aeb18c4fa5cecc44db3537517dade95dc4", size = 10701439 },
+    { url = "https://files.pythonhosted.org/packages/9c/32/0eaeadc679c0f4f278c8b85ba0050eafa9f50727deda4c5ab5b11f537484/pychoco-0.2.1-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:36bd2850805d8e572570af0735d8420262862fa6dde9189a2e5afbc40542905f", size = 10703207 },
+    { url = "https://files.pythonhosted.org/packages/94/36/2f1d498b5e4094046e109291c72648c8d678a8917727c448c0813bd1c8fc/pychoco-0.2.1-cp311-cp311-win_amd64.whl", hash = "sha256:ee55be15f70ecafc7e1eec968831ba95fb0f8fb62dc32e1d27e9dd622700ec89", size = 19534762 },
+    { url = "https://files.pythonhosted.org/packages/98/89/c57091f5d2ee40f13489b6d3fc4b065be95a18387ffced40595cb3e15a69/pychoco-0.2.1-cp312-cp312-macosx_12_0_arm64.whl", hash = "sha256:0327a63041b25bd3e8f1552bbd5fdb907abb4b8c184e918984f54fba31681d77", size = 9254632 },
+    { url = "https://files.pythonhosted.org/packages/1b/b3/850a982b12c50f79fb624267a7d4ceea7b224e0b8d0ef1ba87ae84573d8a/pychoco-0.2.1-cp312-cp312-macosx_12_0_x86_64.whl", hash = "sha256:1fc9225b835d848f4168a5ba0af73316b90621821e815574c1cd6324b1b1abdc", size = 18436713 },
+    { url = "https://files.pythonhosted.org/packages/ec/71/a1ecbb00b3265497e9f775a004c49548358f7fadc2e137277e32d112fba9/pychoco-0.2.1-cp312-cp312-macosx_13_0_arm64.whl", hash = "sha256:543f64e87d5c54cf8bdaf495e02aea6a7b6cc343c21039c44efa901c6dd64516", size = 9222078 },
+    { url = "https://files.pythonhosted.org/packages/c7/cb/1454968792c4c7899b373dd3b5086013ef37fb2ca27eca040c28a1c7c974/pychoco-0.2.1-cp312-cp312-macosx_13_0_x86_64.whl", hash = "sha256:bc5f126679703bb3c377ab63bf03571e66422e55fdca3f78b52cf20696477aee", size = 18408817 },
+    { url = "https://files.pythonhosted.org/packages/6a/68/cbb1527193480d19793007b1fdc2a7610430a0fd74a48bb712fcd72e65df/pychoco-0.2.1-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:15c652c56af86ac5fe74d0877d010565434ca856275881259d1ff5e037e83340", size = 18097171 },
+    { url = "https://files.pythonhosted.org/packages/da/a8/4d8c39085bfe6dd23beada95bc217927829799914a0c60941ee6beb0733d/pychoco-0.2.1-cp312-cp312-macosx_14_0_x86_64.whl", hash = "sha256:5f21bb3ef56ca897169e427b4bc3315e7194c7b783219870316759c87ecad9a1", size = 18432658 },
+    { url = "https://files.pythonhosted.org/packages/df/f8/625f2f90a8168ad156b1257d698a2999712c3b885b38538c1e058f5beee9/pychoco-0.2.1-cp312-cp312-manylinux2014_x86_64.whl", hash = "sha256:4c1aa0ed182509676a1db936a4a4762160c455ec746f00740532846c8ef1bad5", size = 10699891 },
+    { url = "https://files.pythonhosted.org/packages/7b/95/68a3c8821498cb4941b4b65212137e49f35fc79d8c795b588f3d9fd542dc/pychoco-0.2.1-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c61e9fa8abb4d4b3b52e090a737eda334ff93efc90c3166271df689be773f69d", size = 10761034 },
+    { url = "https://files.pythonhosted.org/packages/33/73/45b3bb727197844d283858cd308da661e736c010b2b5834a12bb4ce03f35/pychoco-0.2.1-cp312-cp312-win_amd64.whl", hash = "sha256:dfa06621afab6653885d099b5e3e90e61e7da7de104fb2f883f87ebaa7dbbc67", size = 19536566 },
+    { url = "https://files.pythonhosted.org/packages/78/35/a0a5c3e4f3ecfad99ccb60d42dd5f130bf3c425493438ef60a03769063a9/pychoco-0.2.1-cp313-cp313-macosx_12_0_arm64.whl", hash = "sha256:adbdf25aad218439a7a2a48978b9c35843569a7507e8f27d2b1161e313c84b86", size = 9254629 },
+    { url = "https://files.pythonhosted.org/packages/c0/d3/27a30de406d6f1901b8b143501033bc3aef7826ff4f8368fdd015a5f7c7a/pychoco-0.2.1-cp313-cp313-macosx_12_0_x86_64.whl", hash = "sha256:b2ad6b1792211b456b62e8698857d765db4161aa34b045b27958e3e5f87acc6a", size = 18436714 },
+    { url = "https://files.pythonhosted.org/packages/ba/1a/8907154f17daedc694234dd29729248f785cf5e90fa413a01d945323de6a/pychoco-0.2.1-cp313-cp313-macosx_13_0_arm64.whl", hash = "sha256:26ad8bf9af00d4cb62188e76b88afbaa844e0b70f83564f36f43e9fdd68afc8c", size = 9222073 },
+    { url = "https://files.pythonhosted.org/packages/2f/80/402548311ded0688dd3e01ac217b30f8a83e57b08b6128497fc8977ee0ec/pychoco-0.2.1-cp313-cp313-macosx_13_0_x86_64.whl", hash = "sha256:3918e5bf558f72a75c6b8835e4ccef0efcc9c142840dfdf41c8336a2fd7a599a", size = 18408814 },
+    { url = "https://files.pythonhosted.org/packages/6a/c3/22f7cc46a84c7e8e5725cb6a921613b3ecf94b89cb6aeba2f8befc82b894/pychoco-0.2.1-cp313-cp313-macosx_14_0_arm64.whl", hash = "sha256:e97a58c6cf82ce317a2b9d07ce414e98e5ba0e447681f9832ac90ae91618dc7b", size = 18097167 },
+    { url = "https://files.pythonhosted.org/packages/04/55/b516aacb45c0f9fc2a10c29391fa71728ac98a3e97e2a2faf5bc7bd11eb0/pychoco-0.2.1-cp313-cp313-macosx_14_0_x86_64.whl", hash = "sha256:839ec3b9c0d95b0652c5aa7e71a8cebd7088605d513541e126617d1495b5ad85", size = 18432658 },
+    { url = "https://files.pythonhosted.org/packages/17/b2/8b94ec826a4e8815720700a8cc548aec948599a2eb7b32da69438d9db31c/pychoco-0.2.1-cp313-cp313-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:f78f645880b4bd049356fdc4a78cacb0e5d4ad34fc9c857f6428d7b8c0c2b6d6", size = 10761030 },
+    { url = "https://files.pythonhosted.org/packages/76/53/748d61d91c6b4a6adcd7662d70d3d3e8d3b30932f43412ea413d6f71b93b/pychoco-0.2.1-cp313-cp313-win_amd64.whl", hash = "sha256:be7980b2ba2d97ecb0406fccd8171e6866586016c4a38f95a51f53cb906358e1", size = 19541440 },
+    { url = "https://files.pythonhosted.org/packages/2d/ef/bdab6840db23df180e1def4599d0ec183dddc8a349f50ca7ba2bf9bf6949/pychoco-0.2.1-pp310-pypy310_pp73-macosx_12_0_x86_64.whl", hash = "sha256:7b1476916d9ec903b0175fb826dde24c9cb02edeec81679c7efc61ce03b1a838", size = 18420813 },
+    { url = "https://files.pythonhosted.org/packages/3e/53/e9bcb80610128a9ceef801f768e9ad76f36a1ba82967040bfb86a633378f/pychoco-0.2.1-pp310-pypy310_pp73-macosx_13_0_x86_64.whl", hash = "sha256:43b2965dd7e1f0a419ca2fb25f07054c1f6069c548851e30ea21ecc8dc9e86d5", size = 18395024 },
+    { url = "https://files.pythonhosted.org/packages/a8/6d/d0e29dce666e52ac3875ec267f18870ab16218b7986162f8e848416adb40/pychoco-0.2.1-pp310-pypy310_pp73-macosx_14_0_arm64.whl", hash = "sha256:08d95f6f6933250cbbfb81120814f0f9029dd44d9a3c3a93fe4a1a77d9a7aeb1", size = 18083794 },
+    { url = "https://files.pythonhosted.org/packages/2c/93/ab17149df7e10966c6775d9c2142ecb7fe816a22740cbc1c51a4ad564b5a/pychoco-0.2.1-pp310-pypy310_pp73-macosx_14_0_x86_64.whl", hash = "sha256:b0d8036e814cfeafc0cee3bc95b95f679675a6d3054dfd7a28c8ed78a6aa42f3", size = 18416755 },
+    { url = "https://files.pythonhosted.org/packages/01/7b/19585e4c9c294c13bd120cfff9875531b22455e201f6dc8cf7900d5ffe30/pychoco-0.2.1-pp310-pypy310_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:578847a8275e6094150d492c69dd609e196af0b84ca6f923361adf59dc577de4", size = 10144627 },
+    { url = "https://files.pythonhosted.org/packages/a0/b5/c34de6f31a165f72c144f20ab545004b8620144d36c203111c57d98efd5f/pychoco-0.2.1-pp310-pypy310_pp73-win_amd64.whl", hash = "sha256:3466a266886d0f1cd8b40a74585ba76664a3a9471c3badb21d69efef7579dc58", size = 19541944 },
+]
+
+[[package]]
 name = "pycparser"
 version = "2.22"
 source = { registry = "https://pypi.org/simple" }
@@ -1547,6 +1595,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "jupyterlab" },
+    { name = "pychoco" },
     { name = "selenium" },
     { name = "webdriver-manager" },
 ]
@@ -1554,6 +1603,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "jupyterlab", specifier = ">=4.3.1" },
+    { name = "pychoco", specifier = ">=0.2.1" },
     { name = "selenium", specifier = ">=4.27.1" },
     { name = "webdriver-manager", specifier = ">=4.0.2" },
 ]
