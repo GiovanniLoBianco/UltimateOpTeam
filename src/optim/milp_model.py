@@ -8,6 +8,8 @@ from ortools.linear_solver import pywraplp
 
 from data.player import Player
 
+M = 3
+
 
 class UT_MILP_Model:
     """
@@ -17,6 +19,7 @@ class UT_MILP_Model:
     ----------
     - players: list of players
     - formation: formation name
+    - alpha: objective weights
     """
 
     def __init__(self, players: Sequence[Player], formation: str):
@@ -109,6 +112,163 @@ class UT_MILP_Model:
             self.final_chemistry[k_pos] = self.solver.IntVar(0, 3, f"final_ch_{k_pos}")
 
     def _add_constraint(self):
+        self._add_players_assignment_constraint()
+        self._add_category_coherence_constraint()
+        self._add_score_mode_constraint()
+        self._add_score_position_constraint
+
+    def _add_players_assignment_constraint(self):
+        """
+        Constraints related to players to positions assignment.
+        """
+        for k_pos, _ in enumerate(self.positions):
+            self.solver.Add(
+                sum(
+                    self.x[(i_player, k_pos)] for i_player, _ in enumerate(self.players)
+                )
+                <= 1
+            )
+
+        for i_player, _ in enumerate(self.players):
+            self.solver.Add(
+                sum(self.x[(i_player, k_pos)] for k_pos, _ in enumerate(self.positions))
+                <= 1
+            )
+
+        for i_player, player in enumerate(self.players):
+            for k_pos, position in enumerate(self.positions):
+                if not player.can_play_at(position):
+                    self.solver.Add(self.x[(i_player, k_pos)] == 0)
+
+    def _add_category_coherence_constraint(self):
+        """
+        Constraints related to category to position assignment.
+        """
+        for cat in ["nations", "leagues", "clubs"]:
+            for k_pos, _ in enumerate(self.positions):
+                for j_cat, _ in enumerate(getattr(self, cat)):
+                    self.solver.Add(
+                        sum(
+                            self.x[(i_player, k_pos)]
+                            for i_player, player in enumerate(self.players)
+                            if getattr(player, cat) == getattr(self, cat)[j_cat]
+                        )
+                        >= self.y[cat][(k_pos, j_cat)]
+                    )
+
+        for k_pos, _ in enumerate(self.positions):
+            for j_nat, _ in enumerate(self.nations):
+                self.solver.Add(
+                    sum(
+                        self.x[(i_player, k_pos)]
+                        for i_player, player in enumerate(self.players)
+                        if player.nation == self.nations[j_nat]
+                    )
+                    >= self.y["icon"][(k_pos, j_nat)]
+                )
+
+        for k_pos, _ in enumerate(self.positions):
+            for j_league, _ in enumerate(self.leagues):
+                self.solver.Add(
+                    sum(
+                        self.x[(i_player, k_pos)]
+                        for i_player, player in enumerate(self.players)
+                        if player.league == self.leagues[j_league]
+                    )
+                    >= self.y["hero"][(k_pos, j_league)]
+                )
+
+    def _add_score_mode_constraint(self):
+        """
+        Constraints related to how score is computed for each nation, club and league.
+        """
+
+        for j_nation, _ in enumerate(self.nations):
+            self.solver.Add(
+                3 * self.gamma["nations"][(j_nation, 1)]
+                + 5 * self.gamma["nations"][(j_nation, 2)]
+                + 8 * self.gamma["nations"][(j_nation, 3)]
+                <= sum(
+                    self.y["nations"][(k_pos, j_nation)]
+                    for k_pos, _ in enumerate(self.positions)
+                )
+                + sum(
+                    self.y["icon"][(k_pos, j_nation)]
+                    for k_pos, _ in enumerate(self.positions)
+                )
+            )
+            self.solver.Add(
+                sum(self.gamma["nations"][(j_nation, mode)] for mode in range(4)) <= 1
+            )
+
+        for j_league, _ in enumerate(self.leagues):
+            self.solver.Add(
+                3 * self.gamma["leagues"][(j_league, 1)]
+                + 5 * self.gamma["leagues"][(j_league, 2)]
+                + 8 * self.gamma["leagues"][(j_league, 3)]
+                <= sum(
+                    self.y["leagues"][(k_pos, j_league)]
+                    for k_pos, _ in enumerate(self.positions)
+                )
+                + sum(
+                    self.y["hero"][(k_pos, j_league)]
+                    for k_pos, _ in enumerate(self.positions)
+                )
+            )
+            self.solver.Add(
+                sum(self.gamma["leagues"][(j_league, mode)] for mode in range(4)) <= 1
+            )
+
+        for j_club, _ in enumerate(self.clubs):
+            self.solver.Add(
+                2 * self.gamma["clubs"][(j_club, 1)]
+                + 5 * self.gamma["clubs"][(j_club, 2)]
+                + 8 * self.gamma["clubs"][(j_club, 3)]
+                <= sum(
+                    self.y["clubs"][(k_pos, j_club)]
+                    for k_pos, _ in enumerate(self.positions)
+                )
+            )
+            self.solver.Add(
+                sum(self.gamma["clubs"][(j_club, mode)] for mode in range(4)) <= 1
+            )
+
+        for i_player, player in enumerate(self.players):
+            self.solver.Add(
+                self.chemistry["player"][i_player]
+                <= sum(
+                    mode * self.gamma[cat][(j_cat, mode)]
+                    for cat in ["nations", "leagues", "clubs"]
+                    for j_cat, _ in enumerate(getattr(self, cat))
+                    for mode in range(4)
+                    if getattr(player, cat) == getattr(self, cat)[j_cat]
+                )
+            )
+
+    def _add_score_position_constraint(self):
+        """
+        Constraints related to computation of score at each position.
+        """
+        for k_pos, _ in enumerate(self.positions):
+            for i_player, player in enumerate(self.players):
+                self.solver.Add(
+                    self.chemistry["position"][k_pos]
+                    <= (1 - self.x[(i_player, k_pos)]) * M
+                    + self.chemistry["player"][i_player]
+                )
+
+            self.solver.Add(
+                self.final_chemistry["position"][k_pos]
+                <= M
+                * sum(
+                    self.x[(i_player, k_pos)]
+                    for i_player, player in enumerate(self.players)
+                    if player.icon or player.hero
+                )
+                + self.chemistry["position"][k_pos]
+            )
+
+    def _add_objective(self):
         pass
 
     def solve(self):
