@@ -124,7 +124,7 @@ class UT_MILP_Model:
         """
         for k_pos, _ in enumerate(self.positions):
             self.solver.Add(
-                sum(
+                self.solver.Sum(
                     self.x[(i_player, k_pos)] for i_player, _ in enumerate(self.players)
                 )
                 <= 1
@@ -132,7 +132,9 @@ class UT_MILP_Model:
 
         for i_player, _ in enumerate(self.players):
             self.solver.Add(
-                sum(self.x[(i_player, k_pos)] for k_pos, _ in enumerate(self.positions))
+                self.solver.Sum(
+                    self.x[(i_player, k_pos)] for k_pos, _ in enumerate(self.positions)
+                )
                 <= 1
             )
 
@@ -149,7 +151,7 @@ class UT_MILP_Model:
             for k_pos, _ in enumerate(self.positions):
                 for j_cat, _ in enumerate(getattr(self, cat)):
                     self.solver.Add(
-                        sum(
+                        self.solver.Sum(
                             self.x[(i_player, k_pos)]
                             for i_player, player in enumerate(self.players)
                             if getattr(player, cat) == getattr(self, cat)[j_cat]
@@ -160,7 +162,7 @@ class UT_MILP_Model:
         for k_pos, _ in enumerate(self.positions):
             for j_nat, _ in enumerate(self.nations):
                 self.solver.Add(
-                    sum(
+                    self.solver.Sum(
                         self.x[(i_player, k_pos)]
                         for i_player, player in enumerate(self.players)
                         if player.nation == self.nations[j_nat]
@@ -171,7 +173,7 @@ class UT_MILP_Model:
         for k_pos, _ in enumerate(self.positions):
             for j_league, _ in enumerate(self.leagues):
                 self.solver.Add(
-                    sum(
+                    self.solver.Sum(
                         self.x[(i_player, k_pos)]
                         for i_player, player in enumerate(self.players)
                         if player.league == self.leagues[j_league]
@@ -189,17 +191,20 @@ class UT_MILP_Model:
                 3 * self.gamma["nations"][(j_nation, 1)]
                 + 5 * self.gamma["nations"][(j_nation, 2)]
                 + 8 * self.gamma["nations"][(j_nation, 3)]
-                <= sum(
+                <= self.solver.Sum(
                     self.y["nations"][(k_pos, j_nation)]
                     for k_pos, _ in enumerate(self.positions)
                 )
-                + sum(
+                + self.solver.Sum(
                     self.y["icon"][(k_pos, j_nation)]
                     for k_pos, _ in enumerate(self.positions)
                 )
             )
             self.solver.Add(
-                sum(self.gamma["nations"][(j_nation, mode)] for mode in range(4)) <= 1
+                self.solver.Sum(
+                    self.gamma["nations"][(j_nation, mode)] for mode in range(4)
+                )
+                <= 1
             )
 
         for j_league, _ in enumerate(self.leagues):
@@ -207,17 +212,20 @@ class UT_MILP_Model:
                 3 * self.gamma["leagues"][(j_league, 1)]
                 + 5 * self.gamma["leagues"][(j_league, 2)]
                 + 8 * self.gamma["leagues"][(j_league, 3)]
-                <= sum(
+                <= self.solver.Sum(
                     self.y["leagues"][(k_pos, j_league)]
                     for k_pos, _ in enumerate(self.positions)
                 )
-                + sum(
+                + self.solver.Sum(
                     self.y["hero"][(k_pos, j_league)]
                     for k_pos, _ in enumerate(self.positions)
                 )
             )
             self.solver.Add(
-                sum(self.gamma["leagues"][(j_league, mode)] for mode in range(4)) <= 1
+                self.solver.Sum(
+                    self.gamma["leagues"][(j_league, mode)] for mode in range(4)
+                )
+                <= 1
             )
 
         for j_club, _ in enumerate(self.clubs):
@@ -225,19 +233,22 @@ class UT_MILP_Model:
                 2 * self.gamma["clubs"][(j_club, 1)]
                 + 5 * self.gamma["clubs"][(j_club, 2)]
                 + 8 * self.gamma["clubs"][(j_club, 3)]
-                <= sum(
+                <= self.solver.Sum(
                     self.y["clubs"][(k_pos, j_club)]
                     for k_pos, _ in enumerate(self.positions)
                 )
             )
             self.solver.Add(
-                sum(self.gamma["clubs"][(j_club, mode)] for mode in range(4)) <= 1
+                self.solver.Sum(
+                    self.gamma["clubs"][(j_club, mode)] for mode in range(4)
+                )
+                <= 1
             )
 
         for i_player, player in enumerate(self.players):
             self.solver.Add(
                 self.chemistry["player"][i_player]
-                <= sum(
+                <= self.solver.Sum(
                     mode * self.gamma[cat][(j_cat, mode)]
                     for cat in ["nations", "leagues", "clubs"]
                     for j_cat, _ in enumerate(getattr(self, cat))
@@ -261,7 +272,7 @@ class UT_MILP_Model:
             self.solver.Add(
                 self.final_chemistry["position"][k_pos]
                 <= M
-                * sum(
+                * self.solver.Sum(
                     self.x[(i_player, k_pos)]
                     for i_player, player in enumerate(self.players)
                     if player.icon or player.hero
