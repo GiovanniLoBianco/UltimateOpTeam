@@ -34,6 +34,7 @@ class UT_MILP_Model:
         self.chemistry = {}
         self.final_chemistry = {}
         self._declare_variables()
+        self._add_constraint
 
         # Constraints
         self.constraints = []
