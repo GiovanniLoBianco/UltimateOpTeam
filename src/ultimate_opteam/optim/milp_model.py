@@ -78,7 +78,7 @@ class UT_MILP_Model:
                 self.x[(i_player, k_pos)] = self.solver.BoolVar(f"x_{i_player}_{k_pos}")
 
         # category coherence variables
-        for cat in ["nation", "league", "club"]:
+        for cat in ["nation", "league", "clubFIX"]:
             self.y[cat] = {}
             for k_pos, _ in enumerate(self.positions):
                 for j_cat, _ in enumerate(getattr(self, cat)):
