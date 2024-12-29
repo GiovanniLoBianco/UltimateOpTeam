@@ -60,15 +60,15 @@ class UT_MILP_Model:
             return formations[self.formation]
 
     @cached_property
-    def nations(self) -> tuple[str]:
+    def nation(self) -> tuple[str]:
         return tuple([player.nation for player in self.players])
 
     @cached_property
-    def leagues(self) -> tuple[str]:
+    def league(self) -> tuple[str]:
         return tuple([player.league for player in self.players])
 
     @cached_property
-    def clubs(self) -> tuple[str]:
+    def club(self) -> tuple[str]:
         return tuple([player.club for player in self.players])
 
     def _declare_variables(self):
@@ -78,7 +78,7 @@ class UT_MILP_Model:
                 self.x[(i_player, k_pos)] = self.solver.BoolVar(f"x_{i_player}_{k_pos}")
 
         # category coherence variables
-        for cat in ["nations", "leagues", "clubs"]:
+        for cat in ["nation", "league", "club"]:
             self.y[cat] = {}
             for k_pos, _ in enumerate(self.positions):
                 for j_cat, _ in enumerate(getattr(self, cat)):
@@ -87,19 +87,19 @@ class UT_MILP_Model:
                     )
         self.y["icon"] = {}
         for k_pos, _ in enumerate(self.positions):
-            for j_nat, _ in enumerate(self.nations):
+            for j_nat, _ in enumerate(self.nation):
                 self.y["icon"][(k_pos, j_nat)] = self.solver.BoolVar(
                     f"y^icon_{k_pos}_{j_nat}"
                 )
         self.y["hero"] = {}
         for k_pos, _ in enumerate(self.positions):
-            for j_league, _ in enumerate(self.leagues):
+            for j_league, _ in enumerate(self.league):
                 self.y["hero"][(k_pos, j_league)] = self.solver.BoolVar(
                     f"y^hero_{k_pos}_{j_league}"
                 )
 
         # score mode variables
-        for cat in ["nations", "leagues", "clubs"]:
+        for cat in ["nation", "league", "club"]:
             self.gamma[cat] = {}
             for j_cat, _ in enumerate(getattr(self, cat)):
                 for mode in range(4):
@@ -156,7 +156,7 @@ class UT_MILP_Model:
         """
         Constraints related to category to position assignment.
         """
-        for cat in ["nations", "leagues", "clubs"]:
+        for cat in ["nation", "league", "club"]:
             for k_pos, _ in enumerate(self.positions):
                 for j_cat, _ in enumerate(getattr(self, cat)):
                     self.solver.Add(
@@ -169,23 +169,23 @@ class UT_MILP_Model:
                     )
 
         for k_pos, _ in enumerate(self.positions):
-            for j_nat, _ in enumerate(self.nations):
+            for j_nat, _ in enumerate(self.nation):
                 self.solver.Add(
                     self.solver.Sum(
                         self.x[(i_player, k_pos)]
                         for i_player, player in enumerate(self.players)
-                        if player.nation == self.nations[j_nat]
+                        if player.nation == self.nation[j_nat]
                     )
                     >= self.y["icon"][(k_pos, j_nat)]
                 )
 
         for k_pos, _ in enumerate(self.positions):
-            for j_league, _ in enumerate(self.leagues):
+            for j_league, _ in enumerate(self.league):
                 self.solver.Add(
                     self.solver.Sum(
                         self.x[(i_player, k_pos)]
                         for i_player, player in enumerate(self.players)
-                        if player.league == self.leagues[j_league]
+                        if player.league == self.league[j_league]
                     )
                     >= self.y["hero"][(k_pos, j_league)]
                 )
@@ -195,13 +195,13 @@ class UT_MILP_Model:
         Constraints related to how score is computed for each nation, club and league.
         """
 
-        for j_nation, _ in enumerate(self.nations):
+        for j_nation, _ in enumerate(self.nation):
             self.solver.Add(
-                3 * self.gamma["nations"][(j_nation, 1)]
-                + 5 * self.gamma["nations"][(j_nation, 2)]
-                + 8 * self.gamma["nations"][(j_nation, 3)]
+                3 * self.gamma["nation"][(j_nation, 1)]
+                + 5 * self.gamma["nation"][(j_nation, 2)]
+                + 8 * self.gamma["nation"][(j_nation, 3)]
                 <= self.solver.Sum(
-                    self.y["nations"][(k_pos, j_nation)]
+                    self.y["nation"][(k_pos, j_nation)]
                     for k_pos, _ in enumerate(self.positions)
                 )
                 + self.solver.Sum(
@@ -211,18 +211,18 @@ class UT_MILP_Model:
             )
             self.solver.Add(
                 self.solver.Sum(
-                    self.gamma["nations"][(j_nation, mode)] for mode in range(4)
+                    self.gamma["nation"][(j_nation, mode)] for mode in range(4)
                 )
                 <= 1
             )
 
-        for j_league, _ in enumerate(self.leagues):
+        for j_league, _ in enumerate(self.league):
             self.solver.Add(
-                3 * self.gamma["leagues"][(j_league, 1)]
-                + 5 * self.gamma["leagues"][(j_league, 2)]
-                + 8 * self.gamma["leagues"][(j_league, 3)]
+                3 * self.gamma["league"][(j_league, 1)]
+                + 5 * self.gamma["league"][(j_league, 2)]
+                + 8 * self.gamma["league"][(j_league, 3)]
                 <= self.solver.Sum(
-                    self.y["leagues"][(k_pos, j_league)]
+                    self.y["league"][(k_pos, j_league)]
                     for k_pos, _ in enumerate(self.positions)
                 )
                 + self.solver.Sum(
@@ -232,25 +232,23 @@ class UT_MILP_Model:
             )
             self.solver.Add(
                 self.solver.Sum(
-                    self.gamma["leagues"][(j_league, mode)] for mode in range(4)
+                    self.gamma["league"][(j_league, mode)] for mode in range(4)
                 )
                 <= 1
             )
 
-        for j_club, _ in enumerate(self.clubs):
+        for j_club, _ in enumerate(self.club):
             self.solver.Add(
-                2 * self.gamma["clubs"][(j_club, 1)]
-                + 5 * self.gamma["clubs"][(j_club, 2)]
-                + 8 * self.gamma["clubs"][(j_club, 3)]
+                2 * self.gamma["club"][(j_club, 1)]
+                + 5 * self.gamma["club"][(j_club, 2)]
+                + 8 * self.gamma["club"][(j_club, 3)]
                 <= self.solver.Sum(
-                    self.y["clubs"][(k_pos, j_club)]
+                    self.y["club"][(k_pos, j_club)]
                     for k_pos, _ in enumerate(self.positions)
                 )
             )
             self.solver.Add(
-                self.solver.Sum(
-                    self.gamma["clubs"][(j_club, mode)] for mode in range(4)
-                )
+                self.solver.Sum(self.gamma["club"][(j_club, mode)] for mode in range(4))
                 <= 1
             )
 
@@ -259,7 +257,7 @@ class UT_MILP_Model:
                 self.chemistry["player"][i_player]
                 <= self.solver.Sum(
                     mode * self.gamma[cat][(j_cat, mode)]
-                    for cat in ["nations", "leagues", "clubs"]
+                    for cat in ["nation", "league", "club"]
                     for j_cat, _ in enumerate(getattr(self, cat))
                     for mode in range(4)
                     if getattr(player, cat) == getattr(self, cat)[j_cat]
