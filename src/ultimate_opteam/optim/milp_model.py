@@ -6,7 +6,7 @@ from typing import Sequence
 
 from ortools.linear_solver import pywraplp
 
-from data.player import Player
+from ..data.player import Player
 
 M = 3
 
