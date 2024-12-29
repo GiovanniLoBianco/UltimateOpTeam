@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Sequence
 
 import pandas as pd
+import numpy as np
 
 
 @dataclass
@@ -63,13 +64,19 @@ def get_players_from_csv(path_csv: Path) -> Sequence[Player]:
     - list of players
     """
     players = []
-    df_players = pd.read_csv(path_csv, dtype={"rating": int})
+    df_players = pd.read_csv(
+        path_csv,
+        dtype={"rating": int},
+        converters={"Alternate positions": lambda x: x if x is not None else ""},
+    )
     for _, row in df_players.iterrows():
         players.append(
             Player(
                 name=row["Full Name"],
-                preferred_position=row["Preffered Position"],
-                alternate_position=row["Alternate positions"].split(","),
+                preferred_position=row["Preferred Position"],
+                alternate_position=row["Alternate positions"].split(",")
+                if row["Alternate positions"] != ""
+                else [],
                 rating=row["Overall Rating"],
                 nation=row["Nation"],
                 league=row["League"],
