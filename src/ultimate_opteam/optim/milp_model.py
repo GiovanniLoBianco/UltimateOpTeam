@@ -14,17 +14,24 @@ M = 3
 class UT_MILP_Model:
     """
     MILP model for the Ultimate Team problem.
-
-    Attributes
-    ----------
-    - players: list of players
-    - formation: formation name
-    - alpha: objective weights
     """
 
-    def __init__(self, players: Sequence[Player], formation: str):
+    def __init__(self, players: Sequence[Player], formation: str, alpha: float = 0.8):
+        """
+        Attributes
+        ----------
+        - players: Sequence[Player]
+            sequence of players
+        - formation: str
+            formation name
+        - alpha: float, default 0.8
+            The weight of team chemistry in the objective function. The weight of team rating is 1 -
+            alpha.
+
+        """
         self.players = tuple(players)
         self.formation = formation
+        self.alpha = alpha
         self.solver: pywraplp.Solver = pywraplp.Solver.CreateSolver("SCIP")
 
         # Variables
@@ -37,7 +44,10 @@ class UT_MILP_Model:
 
         # Constraints
         self.constraints = []
-        self._add_constraint
+        self._add_constraint()
+
+        # Objective
+        self._add_objective()
 
     @cached_property
     def positions(self) -> tuple[str]:
@@ -281,7 +291,18 @@ class UT_MILP_Model:
             )
 
     def _add_objective(self):
-        pass
+        self.solver.Maximize(
+            self.alpha
+            * self.solver.Sum(
+                self.final_chemistry[k_pos] for k_pos, _ in enumerate(self.positions)
+            )
+            + (1 - self.alpha)
+            * self.solver.Sum(
+                self.x[(i_player, k_pos)] * player.rating
+                for i_player, player in enumerate(self.players)
+                for k_pos, _ in enumerate(self.positions)
+            )
+        )
 
     def solve(self):
         for constraint in self.constraints:
