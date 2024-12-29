@@ -52,7 +52,8 @@ class UT_MILP_Model:
     @cached_property
     def positions(self) -> tuple[str]:
         path_formation = Path(
-            os.environ["ULTIMATE_OPTEAM_PROJECT_PATH"] + "src/data/formations.json"
+            os.environ["ULTIMATE_OPTEAM_PROJECT_PATH"]
+            + "/src/ultimate_opteam/data/formations.json"
         )
         with open(path_formation, "r") as file:
             formations = json.load(file)
@@ -74,9 +75,7 @@ class UT_MILP_Model:
         # assignment variables
         for i_player, _ in enumerate(self.players):
             for k_pos, _ in enumerate(self.positions):
-                self.x[(i_player, k_pos)] = self.solver.BoolVar(
-                    0, 1, f"x_{i_player}_{k_pos}"
-                )
+                self.x[(i_player, k_pos)] = self.solver.BoolVar(f"x_{i_player}_{k_pos}")
 
         # category coherence variables
         for cat in ["nations", "leagues", "clubs"]:
@@ -84,19 +83,19 @@ class UT_MILP_Model:
             for k_pos, _ in enumerate(self.positions):
                 for j_cat, _ in enumerate(getattr(self, cat)):
                     self.y[cat][(k_pos, j_cat)] = self.solver.BoolVar(
-                        0, 1, f"y^{cat}_{k_pos}_{j_cat}"
+                        f"y^{cat}_{k_pos}_{j_cat}"
                     )
         self.y["icon"] = {}
         for k_pos, _ in enumerate(self.positions):
             for j_nat, _ in enumerate(self.nations):
                 self.y["icon"][(k_pos, j_nat)] = self.solver.BoolVar(
-                    0, 1, f"y^icon_{k_pos}_{j_nat}"
+                    f"y^icon_{k_pos}_{j_nat}"
                 )
         self.y["hero"] = {}
         for k_pos, _ in enumerate(self.positions):
             for j_league, _ in enumerate(self.leagues):
                 self.y["hero"][(k_pos, j_league)] = self.solver.BoolVar(
-                    0, 1, f"y^hero_{k_pos}_{j_league}"
+                    f"y^hero_{k_pos}_{j_league}"
                 )
 
         # score mode variables
@@ -105,7 +104,7 @@ class UT_MILP_Model:
             for j_cat, _ in enumerate(getattr(self, cat)):
                 for mode in range(4):
                     self.gamma[cat][(j_cat, mode)] = self.solver.BoolVar(
-                        0, 1, f"gamma^{cat}_{j_cat}_{mode}"
+                        f"gamma^{cat}_{j_cat}_{mode}"
                     )
 
         # chemistry variables
