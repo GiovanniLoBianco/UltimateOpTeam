@@ -61,15 +61,15 @@ class UT_MILP_Model:
 
     @cached_property
     def nation(self) -> tuple[str]:
-        return tuple([player.nation for player in self.players])
+        return tuple(set([player.nation for player in self.players]))
 
     @cached_property
     def league(self) -> tuple[str]:
-        return tuple([player.league for player in self.players])
+        return tuple(set([player.league for player in self.players]))
 
     @cached_property
     def club(self) -> tuple[str]:
-        return tuple([player.club for player in self.players])
+        return tuple(set([player.club for player in self.players]))
 
     def _declare_variables(self):
         # assignment variables
