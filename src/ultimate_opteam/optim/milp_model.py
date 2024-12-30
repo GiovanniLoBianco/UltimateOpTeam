@@ -125,7 +125,7 @@ class UT_MILP_Model:
         self._add_players_assignment_constraint()
         self._add_category_coherence_constraint()
         self._add_score_mode_constraint()
-        self._add_score_position_constraint
+        self._add_score_position_constraint()
 
     def _add_players_assignment_constraint(self):
         """
