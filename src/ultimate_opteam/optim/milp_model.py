@@ -277,7 +277,7 @@ class UT_MILP_Model:
                 )
 
             self.solver.Add(
-                self.final_chemistry["position"][k_pos]
+                self.final_chemistry[k_pos]
                 <= M
                 * self.solver.Sum(
                     self.x[(i_player, k_pos)]
