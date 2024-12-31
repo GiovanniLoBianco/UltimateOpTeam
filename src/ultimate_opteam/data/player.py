@@ -3,7 +3,6 @@ from pathlib import Path
 from typing import Sequence
 
 import pandas as pd
-import numpy as np
 
 
 @dataclass
