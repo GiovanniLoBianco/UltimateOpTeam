@@ -12,7 +12,7 @@ from ..data import Player, Team
 
 M = 3
 
-logger = loguru.logger()
+logger = loguru.logger
 
 
 class UT_MILP_Model:
@@ -414,6 +414,7 @@ def get_optimal_teams(
         formation = [formation]
     teams = []
     for form in formation:
+        logger.info(f"Search solution for formation: {form}")
         for alpha in np.arange(0, 1 + alpha_step, alpha_step):
             sol = UT_MILP_Model(players, form, alpha).solve()
             teams.extend(sol)
