@@ -6,7 +6,6 @@ from typing import Sequence
 
 from ortools.linear_solver import pywraplp
 import numpy as np
-from numpy._typing import NDArray
 
 from ..data import Player, Team
 
@@ -38,7 +37,7 @@ class UT_MILP_Model:
         # Variables
         self.x = {}
         self.y = {}
-        self.gammac = {}
+        self.gamma = {}
         self.chemistry = {}
         self.final_chemistry = {}
         self._declare_variables()
