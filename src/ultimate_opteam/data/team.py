@@ -73,3 +73,11 @@ class Team:
             if player not in other.composition:
                 return False
         return True
+
+    @staticmethod
+    def remove_duplicates(teams: list["Team"]):
+        """Remove duplicate teams from a sequence of teams."""
+        for team in teams:
+            for other_team in teams:
+                if team.equals(other_team):
+                    teams.remove(other_team)
