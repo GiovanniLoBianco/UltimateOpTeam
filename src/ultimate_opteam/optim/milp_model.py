@@ -3,6 +3,7 @@ import os
 import json
 from pathlib import Path
 from typing import Sequence
+import loguru
 
 from ortools.linear_solver import pywraplp
 import numpy as np
@@ -10,6 +11,8 @@ import numpy as np
 from ..data import Player, Team
 
 M = 3
+
+logger = loguru.logger()
 
 
 class UT_MILP_Model:
@@ -328,11 +331,17 @@ class UT_MILP_Model:
         """Find all optimal solutions and return them as teams."""
         solutions: list[Team] = []
         best_obj = -1
+        logger.info("Start solving MILP model")
+        logger.info(f"formation: {self.formation}")
+        logger.info(f"alpha: {self.alpha}")
         while True:
             # solve
             status = self.solver.Solve()
             if status in [pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE]:
                 # initialize best_obj
+                logger.info(
+                    f"Solution found! Objective value: {self.solver.Objective().Value()}"
+                )
                 if not solutions:
                     best_obj = self.solver.Objective().Value()
 
@@ -341,11 +350,15 @@ class UT_MILP_Model:
 
                 # if solution is worse than best_obj then break
                 if self.solver.Objective().Value() < best_obj:
+                    logger.info("Solution found is worse than previous solution. Stop.")
                     break
 
                 # add team to solutions if not already in
                 if not any(team.equals(sol) for sol in solutions):
                     solutions.append(team)
+                    logger.info("New team added to solutions.")
+                else:
+                    logger.info("Team already in solutions. Search continues.")
 
                 # add constraint to avoid same solution
                 self._ban_current_solution()
