@@ -1,4 +1,4 @@
-from typing import List, Sequence
+from typing import Sequence
 
 from ultimate_opteam.data import Player
 
@@ -63,3 +63,13 @@ class Team:
                 chem += _get_mode(category_score["club"][player.club], [2, 5, 8])
                 player_chem.append((pos, chem))
         return player_chem
+
+    def equals(self, other: "Team") -> bool:
+        """Check if two teams have the same formation and the same players, no matter where they are
+        positioned."""
+        if self.formation != other.formation:
+            return False
+        for _, player in enumerate(self.composition):
+            if player not in other.composition:
+                return False
+        return True
