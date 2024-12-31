@@ -6,7 +6,7 @@ from typing import Sequence
 
 from ortools.linear_solver import pywraplp
 
-from ..data.player import Player
+from ..data import Player, Team
 
 M = 3
 
@@ -27,7 +27,6 @@ class UT_MILP_Model:
         - alpha: float, default 0.8
             The weight of team chemistry in the objective function. The weight of team rating is 1 -
             alpha.
-
         """
         self.players = tuple(players)
         self.formation = formation
@@ -37,7 +36,7 @@ class UT_MILP_Model:
         # Variables
         self.x = {}
         self.y = {}
-        self.gamma = {}
+        self.gammac = {}
         self.chemistry = {}
         self.final_chemistry = {}
         self._declare_variables()
@@ -301,28 +300,55 @@ class UT_MILP_Model:
             )
         )
 
-    def solve(self):
-        for constraint in self.constraints:
-            self.solver.Add(constraint)
+    def _extract_team_from_solution(self):
+        """
+        Extract team from solver's current solution.
+        """
+        composition = []
+        for k_pos, position in enumerate(self.positions):
+            for i_player, player in enumerate(self.players):
+                if self.x[(i_player, k_pos)].solution_value() == 1:
+                    composition.append((position, player))
+        return Team(self.formation, composition)
 
-        status = self.solver.Solve()
+    def _ban_current_solution(self):
+        """Add constraint to avoid same solution"""
+        self.solver.Add(
+            self.solver.Sum(
+                self.x[(i_player, k_pos)]
+                for i_player, _ in enumerate(self.players)
+                for k_pos, _ in enumerate(self.positions)
+                if self.x[(i_player, k_pos)].solution_value() == 1
+            )
+            <= 10
+        )
 
-        if status == pywraplp.Solver.OPTIMAL:
-            return self.solver.Objective().Value()
-        else:
-            return None
+    def solve(self) -> list[Team]:
+        """Find all optimal solutions and return them as teams."""
+        solutions: list[Team] = []
+        best_obj = -1
+        while True:
+            # solve
+            status = self.solver.Solve()
+            if status in [pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE]:
+                # initialize best_obj
+                if not solutions:
+                    best_obj = self.solver.Objective().Value()
 
-    def get_variable_value(self, name):
-        return self.variables[name].solution_value()
+                # extract team from current solution
+                team = self._extract_team_from_solution()
 
-    def get_solver(self):
-        return self.solver
+                # if solution is worse than best_obj then break
+                if self.solver.Objective().Value() < best_obj:
+                    break
 
-    def get_objective(self):
-        return self.solver.Objective()
+                # add team to solutions if not already in
+                if not any(team.equals(sol) for sol in solutions):
+                    solutions.append(team)
 
-    def get_objective_value(self):
-        return self.solver.Objective().Value()
+                # add constraint to avoid same solution
+                self._ban_current_solution()
 
-    def get_solution(self):
-        return {name: self.get_variable_value(name) for name in self.variables.keys()}
+            else:
+                break
+        return solutions
