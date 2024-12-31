@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Sequence
 
 from ortools.linear_solver import pywraplp
+import numpy as np
+from numpy._typing import NDArray
 
 from ..data import Player, Team
 
@@ -352,3 +354,58 @@ class UT_MILP_Model:
             else:
                 break
         return solutions
+
+
+def extract_pareto_frontier(list_teams: list[Team]) -> list[Team]:
+    """
+    Extract Pareto frontier from a list of teams.
+
+    Parameters
+    ----------
+    - list_teams: list[Team]
+        list of teams
+
+    Returns
+    -------
+    - list of teams in the Pareto frontier
+    """
+    pareto_frontier: list[Team] = []
+    for team_1 in list_teams:
+        if not any(
+            team_1.rating <= team_2.rating and team_1.chemistry <= team_2.chemistry
+            for team_2 in list_teams
+        ):
+            pareto_frontier.append(team_1)
+    return pareto_frontier
+
+
+def get_optimal_teams(
+    players: Sequence[Player], formation: str | list[str], alpha_step=0.1
+) -> list[Team]:
+    """
+    Get optimal teams for a given formation and a list of players.
+
+    Parameters
+    ----------
+    - players: Sequence[Player]
+        sequence of players
+    - formation: str | list[str]
+        formation name or list of formation names
+    - alpha_step: float, default 0.1
+        alpha parameter step to explore Pareto frontier
+
+    Returns
+    -------
+    - list of optimal teams
+    """
+    if isinstance(formation, str):
+        formation = [formation]
+    teams = []
+    for form in formation:
+        for alpha in np.arange(0, 1 + alpha_step, alpha_step):
+            sol = UT_MILP_Model(players, form, alpha).solve()
+            teams.extend(sol)
+            Team.remove_duplicates(teams)
+        model = UT_MILP_Model(players, form)
+        teams.extend(model.solve())
+    return extract_pareto_frontier(teams)
