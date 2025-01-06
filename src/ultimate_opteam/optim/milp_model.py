@@ -351,20 +351,19 @@ class UT_MILP_Model:
                 if not solutions:
                     best_obj = self._get_current_objective()
 
-                # extract team from current solution
-                team = self._extract_team_from_solution()
-
                 # if solution is worse than best_obj then break
                 if self._get_current_objective() < best_obj:
                     logger.info("Solution found is worse than previous solution. Stop.")
                     break
 
-                # add team to solutions if not already in
-                if not any(team.equals(sol) for sol in solutions):
-                    solutions.append(team)
-                    logger.info("New team added to solutions.")
-                else:
-                    logger.info("Team already in solutions. Search continues.")
+                # extract team from current solution
+                team = self._extract_team_from_solution()
+
+                # optimize team (reassign players to positions based on position preferences)
+                team = team.optimize()
+
+                solutions.append(team)
+                logger.info("New team added to solutions.")
 
                 # add constraint to avoid same solution
                 self._ban_current_solution()
