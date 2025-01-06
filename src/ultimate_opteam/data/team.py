@@ -81,3 +81,8 @@ class Team:
             for other_team in teams:
                 if team.equals(other_team):
                     teams.remove(other_team)
+
+    @property
+    def players(self) -> list[Player]:
+        """List of players in the team."""
+        return [player for _, player in self.composition]
