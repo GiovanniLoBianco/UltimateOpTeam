@@ -317,13 +317,14 @@ class UT_MILP_Model:
         return Team(self.formation, composition)
 
     def _ban_current_solution(self):
-        """Add constraint to avoid same solution"""
+        """Add constraint to avoid solution with same players."""
+        current_solution = self._extract_team_from_solution()
         self.solver.Add(
             self.solver.Sum(
                 self.x[(i_player, k_pos)]
-                for i_player, _ in enumerate(self.players)
+                for i_player, player in enumerate(self.players)
                 for k_pos, _ in enumerate(self.positions)
-                if self.x[(i_player, k_pos)].solution_value() == 1
+                if player in current_solution.players
             )
             <= 10
         )
