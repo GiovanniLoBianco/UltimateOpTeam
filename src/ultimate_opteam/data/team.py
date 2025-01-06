@@ -60,10 +60,8 @@ class Team:
                 player_chem.append((pos, 3))
             else:
                 chem = 0
-                chem += _get_mode(category_score["league"][getattr(player, cat)])
-                chem += _get_mode(
-                    category_score["nation"][getattr(player, cat)], [2, 5, 8]
-                )
+                chem += _get_mode(category_score["league"][player.league], [2, 4, 7])
+                chem += _get_mode(category_score["nation"][player.nation], [2, 5, 8])
                 chem += _get_mode(category_score["club"][player.club], [2, 4, 7])
                 chem = min(3, chem)
                 player_chem.append((pos, chem))
