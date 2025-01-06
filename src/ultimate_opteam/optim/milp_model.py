@@ -177,7 +177,7 @@ class UT_MILP_Model:
                     self.solver.Sum(
                         self.x[(i_player, k_pos)]
                         for i_player, player in enumerate(self.players)
-                        if player.nation == self.nation[j_nat]
+                        if player.nation == self.nation[j_nat] and player.icon
                     )
                     >= self.y["icon"][(k_pos, j_nat)]
                 )
@@ -188,7 +188,7 @@ class UT_MILP_Model:
                     self.solver.Sum(
                         self.x[(i_player, k_pos)]
                         for i_player, player in enumerate(self.players)
-                        if player.league == self.league[j_league]
+                        if player.league == self.league[j_league] and player.hero
                     )
                     >= self.y["hero"][(k_pos, j_league)]
                 )
