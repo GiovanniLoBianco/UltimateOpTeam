@@ -299,7 +299,7 @@ class UT_MILP_Model:
             )
             + (1 - self.alpha)
             * self.solver.Sum(
-                player.rating / 100 * self.x[(i_player, k_pos)]
+                player.rating / 1100 * self.x[(i_player, k_pos)]
                 for i_player, player in enumerate(self.players)
                 for k_pos, _ in enumerate(self.positions)
             )
