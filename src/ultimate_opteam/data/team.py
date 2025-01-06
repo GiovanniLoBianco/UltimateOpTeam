@@ -1,6 +1,8 @@
 from typing import Sequence
 
 from ultimate_opteam.data import Player
+from scipy.optimize import linear_sum_assignment
+import numpy as np
 
 
 class Team:
@@ -86,3 +88,31 @@ class Team:
     def players(self) -> list[Player]:
         """List of players in the team."""
         return [player for _, player in self.composition]
+
+    def optimize(self) -> "Team":
+        """Reassign players to positions using the Hungarian algorithm to maximize player's
+        preferrences."""
+
+        def calculate_gain(player: Player, position: str):
+            if position == player.preferred_position:
+                return 2
+            elif position in player.alternate_position:
+                return 1
+            return 0
+
+        positions = [pos for pos, _ in self.composition]
+        players = [player for _, player in self.composition]
+
+        cost_matrix = np.zeros((len(players), len(positions)))
+
+        for i, player in enumerate(players):
+            for j, position in enumerate(positions):
+                cost_matrix[i, j] = calculate_gain(player, position)
+
+        row_ind, col_ind = linear_sum_assignment(cost_matrix)
+
+        optimized_composition = [
+            (positions[j], players[i]) for i, j in zip(row_ind, col_ind)
+        ]
+
+        return Team(self.formation, optimized_composition)
