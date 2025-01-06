@@ -294,11 +294,12 @@ class UT_MILP_Model:
         self.solver.Maximize(
             self.alpha
             * self.solver.Sum(
-                self.final_chemistry[k_pos] for k_pos, _ in enumerate(self.positions)
+                1 / 33 * self.final_chemistry[k_pos]
+                for k_pos, _ in enumerate(self.positions)
             )
             + (1 - self.alpha)
             * self.solver.Sum(
-                self.x[(i_player, k_pos)] * player.rating
+                player.rating / 100 * self.x[(i_player, k_pos)]
                 for i_player, player in enumerate(self.players)
                 for k_pos, _ in enumerate(self.positions)
             )
