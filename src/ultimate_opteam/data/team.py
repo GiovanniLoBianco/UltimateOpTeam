@@ -63,6 +63,7 @@ class Team:
                 for cat in ["league", "nation"]:
                     chem += _get_mode(category_score[cat][getattr(player, cat)])
                 chem += _get_mode(category_score["club"][player.club], [2, 5, 8])
+                chem = min(3, chem)
                 player_chem.append((pos, chem))
         return player_chem
 
