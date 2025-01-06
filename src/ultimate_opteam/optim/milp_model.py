@@ -425,6 +425,4 @@ def get_optimal_teams(
             sol = UT_MILP_Model(players, form, alpha).solve()
             teams.extend(sol)
             Team.remove_duplicates(teams)
-        model = UT_MILP_Model(players, form)
-        teams.extend(model.solve())
     return extract_pareto_frontier(teams)
