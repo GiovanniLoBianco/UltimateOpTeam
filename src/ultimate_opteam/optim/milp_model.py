@@ -200,7 +200,7 @@ class UT_MILP_Model:
 
         for j_nation, _ in enumerate(self.nation):
             self.solver.Add(
-                3 * self.gamma["nation"][(j_nation, 1)]
+                2 * self.gamma["nation"][(j_nation, 1)]
                 + 5 * self.gamma["nation"][(j_nation, 2)]
                 + 8 * self.gamma["nation"][(j_nation, 3)]
                 <= self.solver.Sum(
@@ -243,8 +243,8 @@ class UT_MILP_Model:
         for j_club, _ in enumerate(self.club):
             self.solver.Add(
                 2 * self.gamma["club"][(j_club, 1)]
-                + 5 * self.gamma["club"][(j_club, 2)]
-                + 8 * self.gamma["club"][(j_club, 3)]
+                + 4 * self.gamma["club"][(j_club, 2)]
+                + 7 * self.gamma["club"][(j_club, 3)]
                 <= self.solver.Sum(
                     self.y["club"][(k_pos, j_club)]
                     for k_pos, _ in enumerate(self.positions)

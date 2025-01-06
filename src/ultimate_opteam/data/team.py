@@ -60,9 +60,11 @@ class Team:
                 player_chem.append((pos, 3))
             else:
                 chem = 0
-                for cat in ["league", "nation"]:
-                    chem += _get_mode(category_score[cat][getattr(player, cat)])
-                chem += _get_mode(category_score["club"][player.club], [2, 5, 8])
+                chem += _get_mode(category_score["league"][getattr(player, cat)])
+                chem += _get_mode(
+                    category_score["nation"][getattr(player, cat)], [2, 5, 8]
+                )
+                chem += _get_mode(category_score["club"][player.club], [2, 4, 7])
                 chem = min(3, chem)
                 player_chem.append((pos, chem))
         return player_chem
@@ -110,7 +112,7 @@ class Team:
             for j, position in enumerate(positions):
                 cost_matrix[i, j] = calculate_gain(player, position)
 
-        row_ind, col_ind = linear_sum_assignment(cost_matrix)
+        row_ind, col_ind = linear_sum_assignment(cost_matrix, maximize=True)
 
         optimized_composition = [
             (positions[j], players[i]) for i, j in zip(row_ind, col_ind)
