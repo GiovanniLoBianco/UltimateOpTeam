@@ -139,7 +139,8 @@ class UT_MILP_Model:
                 self.solver.Sum(
                     self.x[(i_player, k_pos)] for i_player, _ in enumerate(self.players)
                 )
-                <= 1
+                <= 1,
+                f"position_{k_pos}_must_be_filled",
             )
 
         for i_player, _ in enumerate(self.players):
@@ -147,13 +148,17 @@ class UT_MILP_Model:
                 self.solver.Sum(
                     self.x[(i_player, k_pos)] for k_pos, _ in enumerate(self.positions)
                 )
-                <= 1
+                <= 1,
+                f"player_{i_player}_can_only_play_at_one_position",
             )
 
         for i_player, player in enumerate(self.players):
             for k_pos, position in enumerate(self.positions):
                 if not player.can_play_at(position):
-                    self.solver.Add(self.x[(i_player, k_pos)] == 0)
+                    self.solver.Add(
+                        self.x[(i_player, k_pos)] == 0,
+                        f"player_{i_player}_cannot_play_at_position_{k_pos}",
+                    )
 
     def _add_category_coherence_constraint(self):
         """
@@ -161,36 +166,39 @@ class UT_MILP_Model:
         """
         for cat in ["nation", "league", "club"]:
             for k_pos, _ in enumerate(self.positions):
-                for j_cat, _ in enumerate(getattr(self, cat)):
+                for j_cat, name_cat in enumerate(getattr(self, cat)):
                     self.solver.Add(
                         self.solver.Sum(
                             self.x[(i_player, k_pos)]
                             for i_player, player in enumerate(self.players)
                             if getattr(player, cat) == getattr(self, cat)[j_cat]
                         )
-                        >= self.y[cat][(k_pos, j_cat)]
+                        >= self.y[cat][(k_pos, j_cat)],
+                        f"position_{k_pos}_has_same_{cat}_{name_cat}_as_assigned_player",
                     )
 
         for k_pos, _ in enumerate(self.positions):
-            for j_nat, _ in enumerate(self.nation):
+            for j_nat, name_nat in enumerate(self.nation):
                 self.solver.Add(
                     self.solver.Sum(
                         self.x[(i_player, k_pos)]
                         for i_player, player in enumerate(self.players)
                         if player.nation == self.nation[j_nat] and player.icon
                     )
-                    >= self.y["icon"][(k_pos, j_nat)]
+                    >= self.y["icon"][(k_pos, j_nat)],
+                    f"position_{k_pos}_is_icon_of_{name_cat}_if_assigned_player_is",
                 )
 
         for k_pos, _ in enumerate(self.positions):
-            for j_league, _ in enumerate(self.league):
+            for j_league, name_league in enumerate(self.league):
                 self.solver.Add(
                     self.solver.Sum(
                         self.x[(i_player, k_pos)]
                         for i_player, player in enumerate(self.players)
                         if player.league == self.league[j_league] and player.hero
                     )
-                    >= self.y["hero"][(k_pos, j_league)]
+                    >= self.y["hero"][(k_pos, j_league)],
+                    f"position_{k_pos}_is_hero_of_{name_league}_if_assigned_player_is",
                 )
 
     def _add_score_mode_constraint(self):
@@ -198,7 +206,7 @@ class UT_MILP_Model:
         Constraints related to how score is computed for each nation, club and league.
         """
 
-        for j_nation, _ in enumerate(self.nation):
+        for j_nation, name_nation in enumerate(self.nation):
             self.solver.Add(
                 2 * self.gamma["nation"][(j_nation, 1)]
                 + 5 * self.gamma["nation"][(j_nation, 2)]
@@ -210,16 +218,18 @@ class UT_MILP_Model:
                 + self.solver.Sum(
                     self.y["icon"][(k_pos, j_nation)]
                     for k_pos, _ in enumerate(self.positions)
-                )
+                ),
+                f"nation_{name_nation}_score_mode_constraint",
             )
             self.solver.Add(
                 self.solver.Sum(
                     self.gamma["nation"][(j_nation, mode)] for mode in range(4)
                 )
-                <= 1
+                <= 1,
+                f"only_one_score_mode_for_nation_{name_nation}",
             )
 
-        for j_league, _ in enumerate(self.league):
+        for j_league, name_league in enumerate(self.league):
             self.solver.Add(
                 3 * self.gamma["league"][(j_league, 1)]
                 + 5 * self.gamma["league"][(j_league, 2)]
@@ -231,16 +241,18 @@ class UT_MILP_Model:
                 + self.solver.Sum(
                     self.y["hero"][(k_pos, j_league)]
                     for k_pos, _ in enumerate(self.positions)
-                )
+                ),
+                f"league_{name_league}_score_mode_constraint",
             )
             self.solver.Add(
                 self.solver.Sum(
                     self.gamma["league"][(j_league, mode)] for mode in range(4)
                 )
-                <= 1
+                <= 1,
+                f"only_one_score_mode_for_league_{name_league}",
             )
 
-        for j_club, _ in enumerate(self.club):
+        for j_club, name_club in enumerate(self.club):
             self.solver.Add(
                 2 * self.gamma["club"][(j_club, 1)]
                 + 4 * self.gamma["club"][(j_club, 2)]
@@ -248,11 +260,13 @@ class UT_MILP_Model:
                 <= self.solver.Sum(
                     self.y["club"][(k_pos, j_club)]
                     for k_pos, _ in enumerate(self.positions)
-                )
+                ),
+                f"club_{name_club}_score_mode_constraint",
             )
             self.solver.Add(
                 self.solver.Sum(self.gamma["club"][(j_club, mode)] for mode in range(4))
-                <= 1
+                <= 1,
+                f"only_one_score_mode_for_club_{name_club}",
             )
 
         for i_player, player in enumerate(self.players):
@@ -264,7 +278,8 @@ class UT_MILP_Model:
                     for j_cat, _ in enumerate(getattr(self, cat))
                     for mode in range(4)
                     if getattr(player, cat) == getattr(self, cat)[j_cat]
-                )
+                ),
+                f"player_{i_player}_chemistry_constraint",
             )
 
     def _add_score_position_constraint(self):
@@ -276,7 +291,8 @@ class UT_MILP_Model:
                 self.solver.Add(
                     self.chemistry["position"][k_pos]
                     <= (1 - self.x[(i_player, k_pos)]) * M
-                    + self.chemistry["player"][i_player]
+                    + self.chemistry["player"][i_player],
+                    f"position_{k_pos}_chemistry_is_inferior_to_player_{i_player}_chemistry",
                 )
 
             self.solver.Add(
@@ -287,7 +303,8 @@ class UT_MILP_Model:
                     for i_player, player in enumerate(self.players)
                     if player.icon or player.hero
                 )
-                + self.chemistry["position"][k_pos]
+                + self.chemistry["position"][k_pos],
+                f"position_{k_pos}_final_chemistry_constraint",
             )
 
     def _add_objective(self):
@@ -316,7 +333,7 @@ class UT_MILP_Model:
                     composition.append((position, player))
         return Team(self.formation, composition)
 
-    def _ban_current_solution(self):
+    def _ban_current_solution(self, ban_count: int):
         """Add constraint to avoid solution with same players."""
         current_solution = self._extract_team_from_solution()
         self.solver.Add(
@@ -326,7 +343,8 @@ class UT_MILP_Model:
                 for k_pos, _ in enumerate(self.positions)
                 if player in current_solution.players
             )
-            <= 10
+            <= 10,
+            f"ban_current_solution_{ban_count}",
         )
 
     def _get_current_objective(self) -> int:
@@ -366,7 +384,7 @@ class UT_MILP_Model:
                 logger.info("New team added to solutions.")
 
                 # add constraint to avoid same solution
-                self._ban_current_solution()
+                self._ban_current_solution(ban_count=len(solutions))
 
             else:
                 break

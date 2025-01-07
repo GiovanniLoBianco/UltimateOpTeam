@@ -1,7 +1,7 @@
 from typing import Sequence
 
 from ultimate_opteam.data import Player
-from scipy.optimize import linear_sum_assignment
+import scipy.optimize as sco
 import numpy as np
 
 
@@ -110,7 +110,7 @@ class Team:
             for j, position in enumerate(positions):
                 cost_matrix[i, j] = calculate_gain(player, position)
 
-        row_ind, col_ind = linear_sum_assignment(cost_matrix, maximize=True)
+        row_ind, col_ind = sco.linear_sum_assignment(cost_matrix, maximize=True)
 
         optimized_composition = [
             (positions[j], players[i]) for i, j in zip(row_ind, col_ind)
