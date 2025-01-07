@@ -347,10 +347,6 @@ class UT_MILP_Model:
             f"ban_current_solution_{ban_count}",
         )
 
-    def _get_current_objective(self) -> int:
-        """Get current objective value."""
-        return int(np.round(self.solver.Objective().Value()))
-
     def solve(self) -> list[Team]:
         """Find all optimal solutions and return them as teams."""
         solutions: list[Team] = []
@@ -364,13 +360,13 @@ class UT_MILP_Model:
             if status in [pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE]:
                 # initialize best_obj
                 logger.info(
-                    f"Solution found! Objective value: {self._get_current_objective()}"
+                    f"Solution found! Objective value: {self.solver.Objective().Value()}"
                 )
                 if not solutions:
-                    best_obj = self._get_current_objective()
+                    best_obj = self.solver.Objective().Value()
 
                 # if solution is worse than best_obj then break
-                if self._get_current_objective() < best_obj:
+                if self.solver.Objective().Value() < best_obj:
                     logger.info("Solution found is worse than previous solution. Stop.")
                     break
 
