@@ -347,6 +347,10 @@ class UT_MILP_Model:
             f"ban_current_solution_{ban_count}",
         )
 
+    def _get_current_objective(self):
+        """Return current objective value, rounded to 6 decimals, to avoid float errors"""
+        return np.round(self.solver.Objective().Value(), decimals=6)
+
     def solve(self) -> list[Team]:
         """Find all optimal solutions and return them as teams."""
         solutions: list[Team] = []
@@ -363,10 +367,10 @@ class UT_MILP_Model:
                     f"Solution found! Objective value: {self.solver.Objective().Value()}"
                 )
                 if not solutions:
-                    best_obj = self.solver.Objective().Value()
+                    best_obj = self._get_current_objective()
 
                 # if solution is worse than best_obj then break
-                if self.solver.Objective().Value() < best_obj:
+                if self._get_current_objective() < best_obj:
                     logger.info("Solution found is worse than previous solution. Stop.")
                     break
 
@@ -411,7 +415,7 @@ def extract_pareto_frontier(list_teams: list[Team]) -> list[Team]:
 
 
 def get_optimal_teams(
-    players: Sequence[Player], formation: str | list[str], alpha_step=0.1
+    players: Sequence[Player], formation: str | list[str], alpha_step=0.05
 ) -> list[Team]:
     """
     Get optimal teams for a given formation and a list of players.
@@ -434,7 +438,7 @@ def get_optimal_teams(
     teams = []
     for form in formation:
         logger.info(f"Search solution for formation: {form}")
-        for alpha in np.arange(0, 1 + alpha_step, alpha_step):
+        for alpha in np.arange(0.05, 1, alpha_step):
             sol = UT_MILP_Model(players, form, alpha).solve()
             teams.extend(sol)
             Team.remove_duplicates(teams)
