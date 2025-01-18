@@ -364,7 +364,7 @@ class UT_MILP_Model:
             if status in [pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE]:
                 # initialize best_obj
                 logger.info(
-                    f"Solution found! Objective value: {self.solver.Objective().Value()}"
+                    f"Solution found! Objective value: {self._get_current_objective()}"
                 )
                 if not solutions:
                     best_obj = self._get_current_objective()
@@ -407,8 +407,10 @@ def extract_pareto_frontier(list_teams: list[Team]) -> list[Team]:
     pareto_frontier: list[Team] = []
     for team_1 in list_teams:
         if not any(
-            team_1.rating <= team_2.rating and team_1.chemistry <= team_2.chemistry
+            (team_1.rating <= team_2.rating and team_1.chemistry < team_2.chemistry)
+            or (team_1.rating < team_2.rating and team_1.chemistry <= team_2.chemistry)
             for team_2 in list_teams
+            if not team_1.equals(team_2)
         ):
             pareto_frontier.append(team_1)
     return pareto_frontier
@@ -437,7 +439,7 @@ def get_optimal_teams(
         formation = [formation]
     teams = []
     for form in formation:
-        logger.info(f"Search solution for formation: {form}")
+        logger.info(f"Search solutions for formation: {form}")
         for alpha in np.arange(0.05, 1, alpha_step):
             sol = UT_MILP_Model(players, form, alpha).solve()
             teams.extend(sol)
