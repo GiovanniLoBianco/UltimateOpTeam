@@ -27,9 +27,9 @@ class Team:
         return sum(player.rating for _, player in self.composition)
 
     @property
-    def chemistry(self) -> int:
+    def chemistry(self) -> list[tuple[str, int]]:
         """Team chemistry."""
-        category_score = {
+        category_score: dict = {
             "club": {},
             "league": {},
             "nation": {},
@@ -78,12 +78,15 @@ class Team:
         return True
 
     @staticmethod
-    def remove_duplicates(teams: list["Team"]):
+    def remove_duplicates(teams: list["Team"]) -> list["Team"]:
         """Remove duplicate teams from a sequence of teams."""
-        for team in teams:
-            for other_team in teams:
-                if team.equals(other_team):
-                    teams.remove(other_team)
+        _teams = teams.copy()
+        filtered = []
+        while len(_teams) > 0:
+            team = _teams.pop(0)
+            filtered.append(team)
+            _teams = [rem_team for rem_team in _teams if not rem_team.equals(team)]
+        return filtered
 
     @property
     def players(self) -> list[Player]:

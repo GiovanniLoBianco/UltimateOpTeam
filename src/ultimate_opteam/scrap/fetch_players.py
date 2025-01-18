@@ -53,7 +53,7 @@ def fetch_players(driver: webdriver.Chrome) -> Sequence[dict[str, Any]]:
             for i_player in range(1, nb_players_on_page + 1)
         ]
         for xpath in PLAYER_LIST_PAGE_XPATH:
-            player_info = {}
+            player_info: dict[str, Any] = {}
 
             # Click on player
             driver.find_element(By.XPATH, xpath).click()

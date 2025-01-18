@@ -38,22 +38,22 @@ class UT_MILP_Model:
         self.solver: pywraplp.Solver = pywraplp.Solver.CreateSolver("SCIP")
 
         # Variables
-        self.x = {}
-        self.y = {}
-        self.gamma = {}
-        self.chemistry = {}
-        self.final_chemistry = {}
+        self.x: dict = {}
+        self.y: dict = {}
+        self.gamma: dict = {}
+        self.chemistry: dict = {}
+        self.final_chemistry: dict = {}
         self._declare_variables()
 
         # Constraints
-        self.constraints = []
+        self.constraints: list = []
         self._add_constraint()
 
         # Objective
         self._add_objective()
 
     @cached_property
-    def positions(self) -> tuple[str]:
+    def positions(self) -> tuple[str, ...]:
         path_formation = Path(
             os.environ["ULTIMATE_OPTEAM_PROJECT_PATH"]
             + "/src/ultimate_opteam/data/formations.json"
@@ -63,15 +63,15 @@ class UT_MILP_Model:
             return formations[self.formation]
 
     @cached_property
-    def nation(self) -> tuple[str]:
+    def nation(self) -> tuple[str, ...]:
         return tuple(set([player.nation for player in self.players]))
 
     @cached_property
-    def league(self) -> tuple[str]:
+    def league(self) -> tuple[str, ...]:
         return tuple(set([player.league for player in self.players]))
 
     @cached_property
-    def club(self) -> tuple[str]:
+    def club(self) -> tuple[str, ...]:
         return tuple(set([player.club for player in self.players]))
 
     def _declare_variables(self):
@@ -443,5 +443,5 @@ def get_optimal_teams(
         for alpha in np.arange(0.05, 1, alpha_step):
             sol = UT_MILP_Model(players, form, alpha).solve()
             teams.extend(sol)
-            Team.remove_duplicates(teams)
+            teams = Team.remove_duplicates(teams)
     return extract_pareto_frontier(teams)
