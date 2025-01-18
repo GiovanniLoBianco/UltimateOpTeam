@@ -102,7 +102,7 @@ class Team:
                 return 2
             elif position in player.alternate_position:
                 return 1
-            return 0
+            return -30
 
         positions = [pos for pos, _ in self.composition]
         players = [player for _, player in self.composition]
