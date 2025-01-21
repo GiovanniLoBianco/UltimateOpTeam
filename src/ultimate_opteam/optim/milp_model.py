@@ -52,6 +52,7 @@ class UT_MILP_Model:
         self.gamma: dict = {}
         self.chemistry: dict = {}
         self.final_chemistry: dict = {}
+        self.objective_var = {}
         if pareto_frontier is not None:
             self.pareto_frontier_var: dict = {}
         self._declare_variables()
@@ -61,8 +62,6 @@ class UT_MILP_Model:
         self._add_constraint()
 
         # Objective
-        self.obj_rating = self.solver.NumVar(lb=0.0, ub=1.0, name="obj_rating")
-        self.obj_chemistry = self.solver.NumVar(lb=0.0, ub=1.0, name="obj_chemistry")
         self._add_objective()
 
     @cached_property
@@ -146,6 +145,14 @@ class UT_MILP_Model:
                         f"is_above_chemistry_{i_team}"
                     ),
                 }
+
+        # objective vars
+        self.objective_var["rating"] = (
+            self.solver.NumVar(lb=0.0, ub=1.0, name="obj_rating"),
+        )
+        self.objective_var["chemistry"] = self.solver.NumVar(
+            lb=0.0, ub=1.0, name="obj_chemistry"
+        )
 
     def _add_constraint(self):
         self._add_players_assignment_constraint()
@@ -335,7 +342,7 @@ class UT_MILP_Model:
 
     def _add_objective(self):
         self.solver.Add(
-            self.obj_chemistry
+            self.objective_var["chemistry"]
             <= self.solver.Sum(
                 1 / 33 * self.final_chemistry[k_pos]
                 for k_pos, _ in enumerate(self.positions)
@@ -343,7 +350,7 @@ class UT_MILP_Model:
             "obj_chemistry_def",
         )
         self.solver.Add(
-            self.obj_rating
+            self.objective_var["rating"]
             <= self.solver.Sum(
                 player.rating / 1100 * self.x[(i_player, k_pos)]
                 for i_player, player in enumerate(self.players)
@@ -393,14 +400,14 @@ class UT_MILP_Model:
                 f"pareto_constraint_{i_team}",
             )
             self.solver.Add(
-                self.obj_chemistry
+                self.objective_var["chemistry"]
                 >= chemistry
                 + self.pareto_frontier_var[f"team_{i_team}"]["above_chemistry"]
                 - 1,
                 f"pareto_above_chemistry_{i_team}",
             )
             self.solver.Add(
-                self.obj_rating
+                self.objective_var["rating"]
                 >= rating
                 + self.pareto_frontier_var[f"team_{i_team}"]["above_rating"]
                 - 1,
