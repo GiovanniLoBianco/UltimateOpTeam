@@ -20,7 +20,13 @@ class UT_MILP_Model:
     MILP model for the Ultimate Team problem.
     """
 
-    def __init__(self, players: Sequence[Player], formation: str, alpha: float = 0.8):
+    def __init__(
+        self,
+        players: Sequence[Player],
+        formation: str,
+        alpha: float = 0.5,
+        pareto_frontier: list[Team] | None = None,
+    ):
         """
         Attributes
         ----------
@@ -28,14 +34,17 @@ class UT_MILP_Model:
             sequence of players
         - formation: str
             formation name
-        - alpha: float, default 0.8
+        - alpha: float, default 0.5
             The weight of team chemistry in the objective function. The weight of team rating is 1 -
             alpha.
+        - pareto_frontier: list[Team] | None, optional (default None)
+            list of teams on the pareto frontier.
         """
         self.players = tuple(players)
         self.formation = formation
         self.alpha = alpha
         self.solver: pywraplp.Solver = pywraplp.Solver.CreateSolver("SCIP")
+        self.pareto_frontier = pareto_frontier
 
         # Variables
         self.x: dict = {}
@@ -43,6 +52,8 @@ class UT_MILP_Model:
         self.gamma: dict = {}
         self.chemistry: dict = {}
         self.final_chemistry: dict = {}
+        if pareto_frontier is not None:
+            self.pareto_frontier_var: dict = {}
         self._declare_variables()
 
         # Constraints
@@ -50,6 +61,8 @@ class UT_MILP_Model:
         self._add_constraint()
 
         # Objective
+        self.obj_rating = self.solver.NumVar(lb=0.0, ub=1.0, name="obj_rating")
+        self.obj_chemistry = self.solver.NumVar(lb=0.0, ub=1.0, name="obj_chemistry")
         self._add_objective()
 
     @cached_property
@@ -124,11 +137,24 @@ class UT_MILP_Model:
         for k_pos, _ in enumerate(self.positions):
             self.final_chemistry[k_pos] = self.solver.IntVar(0, 3, f"final_ch_{k_pos}")
 
+        # pareto frontier variable
+        if self.pareto_frontier is not None:
+            for i_team, team in enumerate(self.pareto_frontier):
+                self.pareto_frontier_var[f"team_{i_team}"] = {
+                    "above_rating": self.solver.BoolVar(f"is_above_rating_{i_team}"),
+                    "above_chemistry": self.solver.BoolVar(
+                        f"is_above_chemistry_{i_team}"
+                    ),
+                }
+
     def _add_constraint(self):
         self._add_players_assignment_constraint()
         self._add_category_coherence_constraint()
         self._add_score_mode_constraint()
         self._add_score_position_constraint()
+        if self.pareto_frontier is not None:
+            self._ban_team_from_pareto_frontier()
+            self._add_pareto_frontier_constraint()
 
     def _add_players_assignment_constraint(self):
         """
@@ -139,7 +165,7 @@ class UT_MILP_Model:
                 self.solver.Sum(
                     self.x[(i_player, k_pos)] for i_player, _ in enumerate(self.players)
                 )
-                <= 1,
+                == 1,
                 f"position_{k_pos}_must_be_filled",
             )
 
@@ -308,18 +334,26 @@ class UT_MILP_Model:
             )
 
     def _add_objective(self):
-        self.solver.Maximize(
-            self.alpha
-            * self.solver.Sum(
+        self.solver.Add(
+            self.obj_chemistry
+            <= self.solver.Sum(
                 1 / 33 * self.final_chemistry[k_pos]
                 for k_pos, _ in enumerate(self.positions)
-            )
-            + (1 - self.alpha)
-            * self.solver.Sum(
+            ),
+            "obj_chemistry_def",
+        )
+        self.solver.Add(
+            self.obj_rating
+            <= self.solver.Sum(
                 player.rating / 1100 * self.x[(i_player, k_pos)]
                 for i_player, player in enumerate(self.players)
                 for k_pos, _ in enumerate(self.positions)
-            )
+            ),
+            "obj_rating_def",
+        )
+
+        self.solver.Maximize(
+            self.alpha * self.obj_chemistry + (1 - self.alpha) * self.obj_rating
         )
 
     def _extract_team_from_solution(self):
@@ -333,62 +367,74 @@ class UT_MILP_Model:
                     composition.append((position, player))
         return Team(self.formation, composition)
 
-    def _ban_current_solution(self, ban_count: int):
+    def _ban_team_from_pareto_frontier(self):
         """Add constraint to avoid solution with same players."""
-        current_solution = self._extract_team_from_solution()
-        self.solver.Add(
-            self.solver.Sum(
-                self.x[(i_player, k_pos)]
-                for i_player, player in enumerate(self.players)
-                for k_pos, _ in enumerate(self.positions)
-                if player in current_solution.players
+        for i_team, team in enumerate(self.pareto_frontier):
+            self.solver.Add(
+                self.solver.Sum(
+                    self.x[(i_player, k_pos)]
+                    for i_player, player in enumerate(self.players)
+                    for k_pos, _ in enumerate(self.positions)
+                    if player in team.players
+                )
+                <= 10,
+                f"ban_team_{i_team}",
             )
-            <= 10,
-            f"ban_current_solution_{ban_count}",
-        )
+
+    def _add_pareto_frontier_constraint(self, pareto_frontier: list[Team]):
+        for i_team, team in enumerate(pareto_frontier):
+            chemistry, _ = team.chemistry
+            chemistry /= 33
+            rating = team.rating / 100
+            self.solver.Add(
+                self.pareto_frontier_var[f"team_{i_team}"]["above_rating"]
+                + self.pareto_frontier_var[f"team_{i_team}"]["above_chemistry"]
+                >= 1,
+                f"pareto_constraint_{i_team}",
+            )
+            self.solver.Add(
+                self.obj_chemistry
+                >= chemistry
+                + self.pareto_frontier_var[f"team_{i_team}"]["above_chemistry"]
+                - 1,
+                f"pareto_above_chemistry_{i_team}",
+            )
+            self.solver.Add(
+                self.obj_rating
+                >= rating
+                + self.pareto_frontier_var[f"team_{i_team}"]["above_rating"]
+                - 1,
+                f"pareto_above_rating_{i_team}",
+            )
 
     def _get_current_objective(self):
         """Return current objective value, rounded to 6 decimals, to avoid float errors"""
         return np.round(self.solver.Objective().Value(), decimals=6)
 
-    def solve(self) -> list[Team]:
+    def solve(self) -> Team | None:
         """Find all optimal solutions and return them as teams."""
-        solutions: list[Team] = []
-        best_obj = -1
         logger.info("Start solving MILP model")
         logger.info(f"formation: {self.formation}")
         logger.info(f"alpha: {self.alpha}")
-        while True:
-            # solve
-            status = self.solver.Solve()
-            if status in [pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE]:
-                # initialize best_obj
-                logger.info(
-                    f"Solution found! Objective value: {self._get_current_objective()}"
-                )
-                if not solutions:
-                    best_obj = self._get_current_objective()
+        # solve
+        status = self.solver.Solve()
+        if status in [pywraplp.Solver.OPTIMAL, pywraplp.Solver.FEASIBLE]:
+            # initialize best_obj
+            logger.info(
+                f"Solution found! Objective value: {self._get_current_objective()}"
+            )
 
-                # if solution is worse than best_obj then break
-                if self._get_current_objective() < best_obj:
-                    logger.info("Solution found is worse than previous solution. Stop.")
-                    break
+            # extract team from current solution
+            team = self._extract_team_from_solution()
 
-                # extract team from current solution
-                team = self._extract_team_from_solution()
+            # optimize team (reassign players to positions based on position preferences)
+            team = team.optimize()
 
-                # optimize team (reassign players to positions based on position preferences)
-                team = team.optimize()
+            return team
 
-                solutions.append(team)
-                logger.info("New team added to solutions.")
-
-                # add constraint to avoid same solution
-                self._ban_current_solution(ban_count=len(solutions))
-
-            else:
-                break
-        return solutions
+        else:
+            logger.info("No solution found!")
+            return None
 
 
 def extract_pareto_frontier(list_teams: list[Team]) -> list[Team]:
@@ -440,8 +486,9 @@ def get_optimal_teams(
     teams = []
     for form in formation:
         logger.info(f"Search solutions for formation: {form}")
-        for alpha in np.arange(0.05, 1, alpha_step):
-            sol = UT_MILP_Model(players, form, alpha).solve()
-            teams.extend(sol)
-            teams = Team.remove_duplicates(teams)
-    return extract_pareto_frontier(teams)
+        sol = UT_MILP_Model(
+            players, form, alpha=0.5, pareto_frontier=teams if len(teams) > 0 else None
+        ).solve()
+        teams.append(sol)
+        teams = extract_pareto_frontier(teams)
+    return teams
