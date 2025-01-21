@@ -144,6 +144,12 @@ class UT_MILP_Model:
                     "above_chemistry": self.solver.BoolVar(
                         f"is_above_chemistry_{i_team}"
                     ),
+                    "rating_ratio": self.solver.NumVar(
+                        lb=0, name=f"rating_ratio_{i_team}"
+                    ),
+                    "chemistry_ratio": self.solver.NumVar(
+                        lb=0, name=f"chemistry_ratio_{i_team}"
+                    ),
                 }
 
         # objective vars
@@ -396,22 +402,34 @@ class UT_MILP_Model:
             self.solver.Add(
                 self.pareto_frontier_var[f"team_{i_team}"]["above_rating"]
                 + self.pareto_frontier_var[f"team_{i_team}"]["above_chemistry"]
+                + 0.5 * self.pareto_frontier_var[f"team_{i_team}"]["rating_ratio"]
+                + 0.5 * self.pareto_frontier_var[f"team_{i_team}"]["chemistry_ratio"]
                 >= 1,
                 f"pareto_constraint_{i_team}",
             )
             self.solver.Add(
                 self.objective_var["chemistry"]
-                >= chemistry
+                > chemistry
                 + self.pareto_frontier_var[f"team_{i_team}"]["above_chemistry"]
                 - 1,
                 f"pareto_above_chemistry_{i_team}",
             )
             self.solver.Add(
                 self.objective_var["rating"]
-                >= rating
+                > rating
                 + self.pareto_frontier_var[f"team_{i_team}"]["above_rating"]
                 - 1,
                 f"pareto_above_rating_{i_team}",
+            )
+            self.solver.Add(
+                self.pareto_frontier_var[f"team_{i_team}"]["rating_ratio"]
+                <= self.objective_var["rating"] / rating,
+                f"pareto_rating_ratio_{i_team}",
+            )
+            self.solver.Add(
+                self.pareto_frontier_var[f"team_{i_team}"]["chemistry_ratio"]
+                <= self.objective_var["chemistry"] / rating,
+                f"pareto_rating_chemistry_{i_team}",
             )
 
     def _get_current_objective(self):
