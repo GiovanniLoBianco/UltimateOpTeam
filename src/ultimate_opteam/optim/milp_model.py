@@ -383,8 +383,8 @@ class UT_MILP_Model:
 
     def _add_pareto_frontier_constraint(self, pareto_frontier: list[Team]):
         for i_team, team in enumerate(pareto_frontier):
-            chemistry, _ = team.chemistry
-            chemistry /= 33
+            _chemistry, _ = team.chemistry
+            chemistry = _chemistry / 33.0
             rating = team.rating / 100
             self.solver.Add(
                 self.pareto_frontier_var[f"team_{i_team}"]["above_rating"]
@@ -483,12 +483,19 @@ def get_optimal_teams(
     """
     if isinstance(formation, str):
         formation = [formation]
-    teams = []
+    teams: list[Team] = []
     for form in formation:
         logger.info(f"Search solutions for formation: {form}")
-        sol = UT_MILP_Model(
-            players, form, alpha=0.5, pareto_frontier=teams if len(teams) > 0 else None
-        ).solve()
-        teams.append(sol)
-        teams = extract_pareto_frontier(teams)
+        while True:
+            sol = UT_MILP_Model(
+                players,
+                form,
+                alpha=0.5,
+                pareto_frontier=teams if len(teams) > 0 else None,
+            ).solve()
+            if sol is not None:
+                teams.append(sol)
+                teams = extract_pareto_frontier(teams)
+            else:
+                break
     return teams

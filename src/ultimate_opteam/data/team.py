@@ -22,7 +22,7 @@ class Team:
         self.composition = composition
 
     @property
-    def rating(self) -> int:
+    def rating(self) -> float:
         """Team rating."""
         return sum(player.rating for _, player in self.composition) / 11
 
