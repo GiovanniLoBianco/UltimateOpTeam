@@ -24,10 +24,10 @@ class Team:
     @property
     def rating(self) -> int:
         """Team rating."""
-        return sum(player.rating for _, player in self.composition)
+        return sum(player.rating for _, player in self.composition) / 11
 
     @property
-    def chemistry(self) -> list[tuple[str, int]]:
+    def chemistry(self) -> tuple[int, list[tuple[str, int]]]:
         """Team chemistry."""
         category_score: dict = {
             "club": {},
@@ -65,7 +65,8 @@ class Team:
                 chem += _get_mode(category_score["club"][player.club], [2, 4, 7])
                 chem = min(3, chem)
                 player_chem.append((pos, chem))
-        return player_chem
+        total_chem = sum(chem for _, chem in player_chem)
+        return total_chem, player_chem
 
     def equals(self, other: "Team") -> bool:
         """Check if two teams have the same formation and the same players, no matter where they are
