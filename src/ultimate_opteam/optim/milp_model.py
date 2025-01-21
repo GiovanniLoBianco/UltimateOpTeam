@@ -391,8 +391,7 @@ class UT_MILP_Model:
 
     def _add_pareto_frontier_constraint(self):
         for i_team, team in enumerate(self.pareto_frontier):
-            _chemistry, _ = team.chemistry
-            chemistry = _chemistry / 33.0
+            chemistry = team.chemistry / 33.0
             rating = team.rating / 100
             self.solver.Add(
                 self.pareto_frontier_var[f"team_{i_team}"]["above_rating"]

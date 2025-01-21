@@ -1,3 +1,4 @@
+from functools import cached_property
 from typing import Sequence
 
 from ultimate_opteam.data import Player
@@ -26,8 +27,8 @@ class Team:
         """Team rating."""
         return sum(player.rating for _, player in self.composition) / 11
 
-    @property
-    def chemistry(self) -> tuple[int, list[tuple[str, int]]]:
+    @cached_property
+    def detailed_chemistry(self) -> tuple[int, list[tuple[str, int]]]:
         """Team chemistry."""
         category_score: dict = {
             "club": {},
@@ -65,8 +66,11 @@ class Team:
                 chem += _get_mode(category_score["club"][player.club], [2, 4, 7])
                 chem = min(3, chem)
                 player_chem.append((pos, chem))
-        total_chem = sum(chem for _, chem in player_chem)
-        return total_chem, player_chem
+        return player_chem
+
+    @property
+    def chemistry(self):
+        return sum(chem for _, chem in self.detailed_chemistry)
 
     def equals(self, other: "Team") -> bool:
         """Check if two teams have the same formation and the same players, no matter where they are
@@ -78,16 +82,16 @@ class Team:
                 return False
         return True
 
-    @staticmethod
-    def remove_duplicates(teams: list["Team"]) -> list["Team"]:
-        """Remove duplicate teams from a sequence of teams."""
-        _teams = teams.copy()
-        filtered = []
-        while len(_teams) > 0:
-            team = _teams.pop(0)
-            filtered.append(team)
-            _teams = [rem_team for rem_team in _teams if not rem_team.equals(team)]
-        return filtered
+    # @staticmethod
+    # def remove_duplicates(teams: list["Team"]) -> list["Team"]:
+    #     """Remove duplicate teams from a sequence of teams."""
+    #     _teams = teams.copy()
+    #     filtered = []
+    #     while len(_teams) > 0:
+    #         team = _teams.pop(0)
+    #         filtered.append(team)
+    #         _teams = [rem_team for rem_team in _teams if not rem_team.equals(team)]
+    #     return filtered
 
     @property
     def players(self) -> list[Player]:
