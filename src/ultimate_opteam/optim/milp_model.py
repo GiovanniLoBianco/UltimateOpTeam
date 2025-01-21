@@ -147,8 +147,8 @@ class UT_MILP_Model:
                 }
 
         # objective vars
-        self.objective_var["rating"] = (
-            self.solver.NumVar(lb=0.0, ub=1.0, name="obj_rating"),
+        self.objective_var["rating"] = self.solver.NumVar(
+            lb=0.0, ub=1.0, name="obj_rating"
         )
         self.objective_var["chemistry"] = self.solver.NumVar(
             lb=0.0, ub=1.0, name="obj_chemistry"
@@ -360,7 +360,8 @@ class UT_MILP_Model:
         )
 
         self.solver.Maximize(
-            self.alpha * self.obj_chemistry + (1 - self.alpha) * self.obj_rating
+            self.alpha * self.objective_var["chemistry"]
+            + (1 - self.alpha) * self.objective_var["rating"]
         )
 
     def _extract_team_from_solution(self):
