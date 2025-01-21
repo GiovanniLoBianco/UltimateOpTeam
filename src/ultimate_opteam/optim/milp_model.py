@@ -381,8 +381,8 @@ class UT_MILP_Model:
                 f"ban_team_{i_team}",
             )
 
-    def _add_pareto_frontier_constraint(self, pareto_frontier: list[Team]):
-        for i_team, team in enumerate(pareto_frontier):
+    def _add_pareto_frontier_constraint(self):
+        for i_team, team in enumerate(self.pareto_frontier):
             _chemistry, _ = team.chemistry
             chemistry = _chemistry / 33.0
             rating = team.rating / 100
