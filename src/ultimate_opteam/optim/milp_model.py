@@ -145,10 +145,10 @@ class UT_MILP_Model:
                         f"is_above_chemistry_{i_team}"
                     ),
                     "rating_ratio": self.solver.NumVar(
-                        lb=0, name=f"rating_ratio_{i_team}"
+                        lb=0, ub=5, name=f"rating_ratio_{i_team}"
                     ),
                     "chemistry_ratio": self.solver.NumVar(
-                        lb=0, name=f"chemistry_ratio_{i_team}"
+                        lb=0, ub=33, name=f"chemistry_ratio_{i_team}"
                     ),
                 }
 
@@ -422,13 +422,14 @@ class UT_MILP_Model:
                 f"pareto_above_rating_{i_team}",
             )
             self.solver.Add(
-                self.pareto_frontier_var[f"team_{i_team}"]["rating_ratio"]
-                <= self.objective_var["rating"] / rating,
+                rating * self.pareto_frontier_var[f"team_{i_team}"]["rating_ratio"]
+                <= self.objective_var["rating"],
                 f"pareto_rating_ratio_{i_team}",
             )
             self.solver.Add(
-                self.pareto_frontier_var[f"team_{i_team}"]["chemistry_ratio"]
-                <= self.objective_var["chemistry"] / rating,
+                chemistry
+                * self.pareto_frontier_var[f"team_{i_team}"]["chemistry_ratio"]
+                <= self.objective_var["chemistry"],
                 f"pareto_rating_chemistry_{i_team}",
             )
 
