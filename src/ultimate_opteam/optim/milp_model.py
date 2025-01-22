@@ -11,6 +11,7 @@ import numpy as np
 from ..data import Player, Team
 
 M = 3
+epsilon = 1e-6
 
 logger = loguru.logger
 
@@ -412,7 +413,7 @@ class UT_MILP_Model:
                 >= chemistry
                 + self.pareto_frontier_var[f"team_{i_team}"]["above_chemistry"]
                 - 1
-                + 1e-6,
+                + epsilon,
                 f"pareto_above_chemistry_{i_team}",
             )
             self.solver.Add(
@@ -420,7 +421,7 @@ class UT_MILP_Model:
                 >= rating
                 + self.pareto_frontier_var[f"team_{i_team}"]["above_rating"]
                 - 1
-                + 1e-6,
+                + epsilon,
                 f"pareto_above_rating_{i_team}",
             )
             self.solver.Add(
