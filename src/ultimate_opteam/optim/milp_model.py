@@ -409,16 +409,18 @@ class UT_MILP_Model:
             )
             self.solver.Add(
                 self.objective_var["chemistry"]
-                > chemistry
+                >= chemistry
                 + self.pareto_frontier_var[f"team_{i_team}"]["above_chemistry"]
-                - 1,
+                - 1
+                + 1e-6,
                 f"pareto_above_chemistry_{i_team}",
             )
             self.solver.Add(
                 self.objective_var["rating"]
-                > rating
+                >= rating
                 + self.pareto_frontier_var[f"team_{i_team}"]["above_rating"]
-                - 1,
+                - 1
+                + 1e-6,
                 f"pareto_above_rating_{i_team}",
             )
             self.solver.Add(
