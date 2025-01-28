@@ -82,17 +82,6 @@ class Team:
                 return False
         return True
 
-    # @staticmethod
-    # def remove_duplicates(teams: list["Team"]) -> list["Team"]:
-    #     """Remove duplicate teams from a sequence of teams."""
-    #     _teams = teams.copy()
-    #     filtered = []
-    #     while len(_teams) > 0:
-    #         team = _teams.pop(0)
-    #         filtered.append(team)
-    #         _teams = [rem_team for rem_team in _teams if not rem_team.equals(team)]
-    #     return filtered
-
     @property
     def players(self) -> list[Player]:
         """List of players in the team."""
