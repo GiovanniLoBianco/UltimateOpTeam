@@ -1,18 +1,15 @@
 ## Introduction
-
 Ultimate OpTeam is a project designed to optimize your team in EA FC's Ultimate Team online
 multiplayer mode. Given the set of players from your Club, the objective is to generate the Pareto
 Frontier of the Ultimate Team Optimization Problem (UTOP), which attempts to find the best
 combination of players that would maximize both the general score and the team's chemistry.
 
 ## Features
-
 - Tools for scraping your Club from the Ultimate Team Web App, in order to pull all your players'
   information.
 - MILP model for finding the optimal Pareto frontier.
 
 ## Next steps
-
 - Scientific documentation for the definition of the Ultimate Team Optimization Problem (UTOP) and
   for the Mixed-Integer Linear Programming (MILP) model associated.
 - Create a Constraint Programming model and benchmark Google OR-Tools and Choco solver on it.
@@ -30,8 +27,8 @@ update the README.md at each new added features.
 
 ## Disclaimer
 Please note that this project involves scraping data from the Ultimate Team Web App to gather the
-necessary information about your players. This is currently the only method available to pull all
-the required data for the optimization process. The scraping process is designed to be very light
-and efficient, requiring updates only once every few hours, days, or weeks to refresh the current
-club information. The number of requests made to the server during scraping is minimal and should
-not cause any significant load.
+necessary information about players from user's Club. This is currently the only method available to
+pull all the required data for the optimization process. The scraping process is designed to be very
+light and efficient, requiring updates only once every few hours, days, or weeks to refresh the
+current club information. The number of requests made to the server during scraping is minimal and
+does not cause any significant load.
