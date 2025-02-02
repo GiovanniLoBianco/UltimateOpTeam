@@ -25,7 +25,8 @@ This is a side project I am doing on my spare time. I am mostly interested in th
 challenge of the UTOP, as well as practicing my coding skills and exploring new python libraries. I
 am not entirely certain that this project would be very helpful to seasoned Ultimate Team players,
 as there are many aspects of the game that are not considered and many subjective choices. That
-being said, this solver is saving me a lot of time when I attempt to optimze my own team.
+being said, this solver is saving me a lot of time when I attempt to optimze my own team. I will
+update the README.md at each new added features.
 
 ## Disclaimer
 Please note that this project involves scraping data from the Ultimate Team Web App to gather the
