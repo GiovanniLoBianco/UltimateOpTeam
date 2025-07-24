@@ -11,5 +11,9 @@ wheels/
 .venv
 
 # Others
+.DS_Store
 .notebook/
 .env
+docs/*
+!docs/**/*.pdf
+!docs/**/*.tex

@@ -9,9 +9,10 @@ combination of players that would maximize both the general score and the team's
   information.
 - MILP model for finding the optimal Pareto frontier.
 
+# Docs
+- MILP model for UTOP and iterative search to find the pareto front.
+
 ## Next steps
-- Scientific documentation for the definition of the Ultimate Team Optimization Problem (UTOP) and
-  for the Mixed-Integer Linear Programming (MILP) model associated.
 - Create a Constraint Programming model and benchmark Google OR-Tools and Choco solver on it.
 - Compare the Constraint Programming approach to the MILP model.
 - Create a Dash app integrating the solver, the scraping plugin and some data visualization.
