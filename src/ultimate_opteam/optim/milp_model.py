@@ -1,5 +1,4 @@
 from functools import cached_property
-import os
 import json
 from pathlib import Path
 from typing import Sequence
@@ -67,10 +66,7 @@ class UT_MILP_Model:
 
     @cached_property
     def positions(self) -> tuple[str, ...]:
-        path_formation = Path(
-            os.environ["ULTIMATE_OPTEAM_PROJECT_PATH"]
-            + "/src/ultimate_opteam/data/formations.json"
-        )
+        path_formation = Path(Path(__file__).parent.parent / "data" / "formations.json")
         with open(path_formation, "r") as file:
             formations = json.load(file)
             return formations[self.formation]
@@ -135,7 +131,7 @@ class UT_MILP_Model:
                 0, 3, f"ch^position_{k_pos}"
             )
         for k_pos, _ in enumerate(self.positions):
-            self.final_chemistry[k_pos] = self.solver.IntVar(0, 3, f"final_ch_{k_pos}")
+            self.final_chemistry[k_pos] = self.solver.IntVar(2, 3, f"final_ch_{k_pos}")
 
         # pareto frontier variable
         if self.pareto_frontier is not None:
