@@ -13,6 +13,7 @@ combination of players that would maximize both the general score and the team's
 - MILP model for UTOP and iterative search to find the pareto front.
 
 ## Next steps
+- Integrate the Manager role into the optimization model.
 - Create a Constraint Programming model and benchmark Google OR-Tools and Choco solver on it.
 - Compare the Constraint Programming approach to the MILP model.
 - Create a Dash app integrating the solver, the scraping plugin and some data visualization.
