@@ -3,6 +3,9 @@ from pathlib import Path
 from typing import Sequence
 
 import pandas as pd
+import json
+
+from .. import ROOT
 
 
 @dataclass
@@ -62,7 +65,7 @@ def get_players_from_csv(path_csv: Path) -> Sequence[Player]:
     -------
     - list of players
     """
-    players = []
+    players: list[Player] = []
     df_players = pd.read_csv(
         path_csv,
         dtype={"rating": int},
@@ -82,4 +85,11 @@ def get_players_from_csv(path_csv: Path) -> Sequence[Player]:
                 club=row["Club"],
             )
         )
+
+    # Merge leagues based on league_pairs.json
+    with open(ROOT / "data" / "league_pairs.json") as f:
+        league_pairs = json.load(f)
+    for player in players:
+        if player.league in league_pairs:
+            player.league = league_pairs[player.league]
     return players
