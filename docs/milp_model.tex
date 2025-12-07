@@ -19,13 +19,13 @@ This document presents a formal mathematical model for the Ultimate Team Optimiz
 \end{abstract}
 
 \section{Problem Description}
-In the popular Ultimate Team game mode of the EA FC video game series, players are tasked with building their dream football squad from a vast collection of player items. Success in this mode is not just about assembling a team of superstars; it's a delicate balancing act between two key metrics: \textbf{Team Rating} and \textbf{Team Chemistry}.
+In the popular Ultimate Team game mode of the EA FC video game series, players are tasked with building their dream football squad from a collection of player items. Success in this mode is not just about assembling a team of superstars; it's a delicate balancing act between two key metrics: \textbf{Team Rating} and \textbf{Team Chemistry}.
 
 \paragraph{Team Rating} is a straightforward average of the individual "Overall" ratings of the 11 players in the starting lineup. A higher rating generally signifies a more talented team on paper.
 
 \paragraph{Team Chemistry}, however, is a more complex system that rewards players for creating links between teammates. Players receive chemistry points if they share the same club, league, or nationality with others in the team. A team with high chemistry receives in-game performance boosts, making the players more effective than their base statistics would suggest.
 
-The core challenge, which we call the \textbf{Ultimate Team Optimization Problem}, arises from the conflict between these two objectives. Often, the highest-rated players do not share the same club or league, making it difficult to achieve high chemistry. Conversely, building a team with perfect chemistry might require using lower-rated players, thus sacrificing overall team talent.
+The core challenge, which we call the \textbf{Ultimate Team Optimization Problem}, arises from the conflict between these two objectives. Often, the highest-rated players do not share the same club or league, making it difficult to achieve high chemistry. Conversely, building a team with perfect chemistry might require using lower-rated players, thus sacrificing overall team talent. More specifically, the collection of players available is limited by the ressources (in-game currency, player items) of the user. Thus, this problem is even more constrained as the user has its ressources limited.
 
 \paragraph{The Role of Formations} An additional layer of complexity is the choice of formation (e.g., 4-4-2, 4-3-3, 5-2-1-2). Each formation dictates the specific positions that must be filled, which in turn affects which players can be used and what chemistry links are possible. The model presented here is designed to solve the optimization problem for a \textit{fixed} formation. To find the absolute best teams, the entire optimization process must be repeated for each desired formation. As we will see, solutions found for one formation can be used to inform and improve the search for subsequent formations.
 
@@ -183,12 +183,13 @@ The following constraints work together for each existing Pareto solution $p$:
 \begin{gather}
     \delta^{rating}_p + \delta^{chem}_p + 0.5 \cdot \rho^{rating}_p + 0.5 \cdot \rho^{chem}_p \ge 1
 \end{gather}
-This is the main logic constraint. It forces the solver into one of two situations:
+This is the main logic constraint. It forces the solver into one of three situations:
 \begin{enumerate}
-    \item \textbf{The new solution is strictly better.} At least one of the $\delta$ variables must be 1, satisfying the constraint.
-    \item \textbf{The new solution has identical objective values.} Both $\delta$ variables will be 0. In this case, the constraint can only be satisfied if both $\rho$ variables are 1.
+    \item The new solution is strictly better in rating ($\delta^{rating}_p=1$).
+    \item The new solution is strictly better in chemistry ($\delta^{chem}_p=1$).
+    \item The new solution has identical objective values to team $p$. In this case, both $\delta$ variables must be 0. The constraint can then only be satisfied if both $\rho$ variables are forced to be 1.
 \end{enumerate}
-The next constraints define when the $\delta$ and $\rho$ variables can be activated.
+The next constraints define when the $\delta$ and $\rho$ variables can be activated. The subtlety of the model lies in how the $\rho$ variables allow for the third case.
 \begin{gather}
     \frac{Z_{Rating}}{Z_{Rating}^{max}} \ge R_p + (\delta^{rating}_p - 1) + \epsilon \\
     \frac{Z_{Chemistry}}{Z_{Chemistry}^{max}} \ge C_p + (\delta^{chem}_p - 1) + \epsilon
@@ -198,7 +199,7 @@ These ensure that if $\delta^{rating}_p$ is 1, the new rating must be greater th
     R_p \cdot \rho^{rating}_p \le \frac{Z_{Rating}}{Z_{Rating}^{max}} \\
     C_p \cdot \rho^{chem}_p \le \frac{Z_{Chemistry}}{Z_{Chemistry}^{max}}
 \end{gather}
-These define the ratios. If the new rating is equal to $R_p$, then $\rho^{rating}_p$ can be at most 1. This interaction ensures that the only way for the $\rho$ variables to satisfy the main constraint is if the objective values are identical to a previous solution.
+These constraints define the ratio variables. Consider the rating ratio $\rho^{rating}_p$. If the new solution's rating is greater than $R_p$, then $\rho^{rating}_p$ can be greater than 1. If the new rating is less than $R_p$, $\rho^{rating}_p$ will be less than 1. Crucially, if the new rating is exactly equal to $R_p$, the constraint becomes $R_p \cdot \rho^{rating}_p \le R_p$, which implies $\rho^{rating}_p \le 1$. Since the main logic constraint (25) is trying to maximize its left-hand side, the solver will push $\rho^{rating}_p$ to its maximum possible value, which is exactly 1 in this case. This is the mechanism that allows the model to find alternative teams with the same objective scores, satisfying constraint (25) via the $\rho$ variables when the $\delta$ variables are both zero.
 
 \subsection{Algorithm for Iterative Search}
 The entire process for finding the complete Pareto frontier across all formations can be summarized in the following algorithm.
